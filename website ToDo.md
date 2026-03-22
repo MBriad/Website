@@ -123,8 +123,8 @@
 
    ### 第五步 — Markdown 编辑器
 
-   - [ ] **安装 react-md-editor**：`npm install @uiw/react-md-editor`
-   - [ ] **集成到 Admin 页**：在文章编辑表单中使用 `<MDEditor>`，左侧编辑右侧预览
+   - [x] **安装 react-md-editor**：`npm install @uiw/react-md-editor`
+   - [x] **集成到 Admin 页**：在文章编辑表单中使用 `<MDEditor>`，左侧编辑右侧预览
 
    ### 第六步 — 图片处理
 

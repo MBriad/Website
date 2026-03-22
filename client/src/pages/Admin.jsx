@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import MDEditor from '@uiw/react-md-editor';
 import { articleAPI, projectAPI, linkAPI, configAPI } from '../api/index.js';
 
 const TABS = [
@@ -234,7 +235,14 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
         <input style={inputStyle} placeholder="分类" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required />
         <input style={inputStyle} placeholder="标签 (逗号分隔)" value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} />
         <input style={inputStyle} placeholder="摘要" value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} required />
-        <textarea style={{ ...inputStyle, minHeight: '200px', resize: 'vertical' }} placeholder="内容 (Markdown)" value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} required />
+        <div data-color-mode="light" style={{ marginBottom: '12px' }}>
+          <MDEditor
+            value={form.content}
+            onChange={(val) => setForm({ ...form, content: val || '' })}
+            height={400}
+            preview="live"
+          />
+        </div>
         <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', cursor: 'pointer' }}>
             <input type="checkbox" checked={form.published} onChange={e => setForm({ ...form, published: e.target.checked })} /> 已发布
