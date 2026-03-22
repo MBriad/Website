@@ -51,7 +51,7 @@ const Category = () => {
       initial="hidden"
       animate="visible"
     >
-      <motion.h1 variants={itemVariants} style={{ fontWeight: 600, fontSize: '1.8rem', marginBottom: '30px' }}>
+      <motion.h1 variants={itemVariants} className="page-title">
         文章<span className="highlight-blue">归档</span>
       </motion.h1>
 

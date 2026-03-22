@@ -1,0 +1,45 @@
+/* src/styles/components/about.css */
+
+/* =========================================
+   8. 关于我页面
+   ========================================= */
+.about-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 120px 20px 10vh;
+  position: relative;
+  z-index: 1;
+}
+
+.page-title {
+  font-weight: 600;
+  font-size: 1.8rem;
+  margin-bottom: 40px;
+}
+
+.about-content {
+  margin-bottom: 50px;
+}
+
+.about-paragraph {
+  font-size: 1rem;
+  line-height: 2;
+  color: var(--text-ink);
+  margin-bottom: 20px;
+}
+
+.about-contact {
+  padding-top: 30px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.about-contact-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.about-contact-links {
+  display: flex;
+  gap: 24px;
+}

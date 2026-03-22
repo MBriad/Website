@@ -21,7 +21,6 @@ import About from './pages/About';
 import Links from './pages/Links';
 import Chip from './pages/Chip';
 import useStore from './store/useStore';
-import './index.css';
 
 const PageWrapper = ({ children }) => (
   <motion.div

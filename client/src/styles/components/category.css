@@ -1,0 +1,136 @@
+/* src/styles/components/category.css */
+
+/* =========================================
+   7. 文章归档页
+   ========================================= */
+.category-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 120px 20px 10vh;
+  position: relative;
+  z-index: 1;
+}
+
+.tag-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  color: var(--text-ink);
+}
+
+.tag-pill:hover {
+  background-color: rgba(160, 216, 239, 0.2);
+}
+
+.tag-pill-active {
+  background-color: rgba(160, 216, 239, 0.4);
+  border-color: var(--accent-blue);
+}
+
+.timeline {
+  position: relative;
+}
+
+.timeline-group {
+  margin-bottom: 30px;
+}
+
+.timeline-month {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-ink);
+  margin-bottom: 16px;
+  padding-left: 20px;
+}
+
+.timeline-line {
+  border-left: 2px solid rgba(160, 216, 239, 0.4);
+  padding-left: 24px;
+}
+
+.timeline-article {
+  position: relative;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -31px;
+  top: 22px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--accent-blue);
+  border: 2px solid white;
+}
+
+.timeline-date {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+
+.timeline-title {
+  font-weight: 500;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.timeline-excerpt {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.timeline-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.timeline-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  color: var(--text-light);
+}
+
+.timeline-empty {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+/* 暗色模式适配 */
+[data-theme='dark'] .tag-pill-active {
+  background-color: rgba(122, 184, 212, 0.3);
+  border-color: var(--accent-blue);
+}
+
+[data-theme='dark'] .timeline-dot {
+  border-color: var(--bg-paper);
+}

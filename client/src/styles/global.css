@@ -1,0 +1,115 @@
+/* src/styles/global.css */
+
+/* 基础重置与纸张质感铺设 */
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--text-ink);
+  background-color: var(--bg-paper);
+  font-family: 'Klee One', "Noto Serif SC", "Songti SC", serif;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-ink);
+}
+
+/* 优雅的文本选中状态 */
+::selection {
+  background: var(--selection-bg);
+  color: var(--text-ink);
+}
+
+/* 带有天空蓝马克笔高亮效果的自定义类 */
+.highlight-blue {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+
+.highlight-blue::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 100%;
+  height: 8px;
+  /* 半透明粗线条效果 */
+  background-color: var(--accent-blue);
+  opacity: 0.6;
+  z-index: -1;
+  transition: height 0.3s ease;
+}
+
+.highlight-blue:hover::after {
+  height: 100%;
+  /* 鼠标悬浮时背景色填满 */
+  opacity: 0.3;
+}
+
+/* =========================================
+   1. 背景图片(GIF/JPG)模糊层
+   ========================================= */
+.bg-image-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+
+  background-image: url('/teto.jpg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--bg-paper);
+
+  filter: blur(4px);
+  will-change: transform, filter;
+  transition: opacity 0.6s ease;
+}
+
+/* =========================================
+   2. 半透明纸张遮罩层 
+   ========================================= */
+.bg-overlay-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+
+  background-color: transparent;
+  transition: background-color 0.6s ease;
+}
+
+/* 非首页：隐藏背景图，切换为纯纸色 */
+.bg-image-layer.bg-hidden {
+  background-image: none;
+}
+
+.bg-overlay-layer.bg-hidden {
+  background-color: var(--bg-paper);
+}
+
+/* =========================================
+   2b. 暗色主题
+   ========================================= */
+[data-theme='dark'] .bg-overlay-layer {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='dark'] .bg-image-layer {
+  background-image: url('/preview.jpg');
+}
+
+[data-theme='dark'] .bg-overlay-layer.bg-hidden {
+  background-color: var(--bg-paper);
+}

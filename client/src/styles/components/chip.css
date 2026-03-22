@@ -1,0 +1,90 @@
+/* src/styles/components/chip.css */
+
+/* =========================================
+   10. 芯片项目页面
+   ========================================= */
+.chip-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 120px 20px 10vh;
+  position: relative;
+  z-index: 1;
+}
+
+.chip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.chip-card {
+  padding: 28px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+
+.chip-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.chip-featured {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background-color: rgba(160, 216, 239, 0.3);
+  border: 1px solid rgba(160, 216, 239, 0.5);
+  color: var(--text-ink);
+}
+
+.chip-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.chip-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+.chip-tech {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.chip-links {
+  display: flex;
+  gap: 16px;
+}
+
+.chip-links a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+.chip-links a:hover {
+  color: var(--accent-blue);
+}
+
+/* 暗色模式适配 */
+[data-theme='dark'] .chip-featured {
+  background-color: rgba(122, 184, 212, 0.2);
+  border-color: rgba(122, 184, 212, 0.4);
+}

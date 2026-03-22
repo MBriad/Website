@@ -1,0 +1,35 @@
+/* src/styles/variables.css */
+
+/* 引入一款免费的日系手写/明朝体 Google 字体 (Klee One 或 Shippori Mincho) */
+@import url('https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap');
+
+:root {
+  /* 我们敲定的核心调色板 */
+  --bg-paper: #F9F9F7;
+  /* 米白和纸色 */
+  --text-ink: #4A4A4A;
+  /* 炭灰墨水色 */
+  --accent-blue: #A0D8EF;
+  /* 空色（日系天空蓝） */
+  --selection-bg: #E0F0FF;
+  /* 鼠标选中文本的极浅蓝色 */
+  
+  /* 语义化颜色变量 */
+  --text-secondary: #666;
+  --text-tertiary: #777;
+  --text-muted: #888;
+  --text-light: #999;
+}
+
+[data-theme='dark'] {
+  --bg-paper: #1a1a1a;
+  --text-ink: #e0e0e0;
+  --accent-blue: #7ab8d4;
+  --selection-bg: #2a2a2a;
+  
+  /* 语义化颜色变量 - 暗色模式 */
+  --text-secondary: #aaa;
+  --text-tertiary: #999;
+  --text-muted: #888;
+  --text-light: #777;
+}

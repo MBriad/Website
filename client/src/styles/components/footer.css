@@ -1,0 +1,41 @@
+/* src/styles/components/footer.css */
+
+/* =========================================
+   15. Footer 页脚组件
+   ========================================= */
+.footer-container {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 20px 30px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.footer-text {
+  margin-bottom: 8px;
+}
+
+.footer-copyright {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.footer-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: var(--text-ink);
+}
+
+/* 暗色模式适配 */
+[data-theme='dark'] .footer-container {
+  color: var(--text-light);
+}
+
+[data-theme='dark'] .footer-copyright {
+  color: var(--text-muted);
+}

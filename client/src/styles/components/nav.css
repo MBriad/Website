@@ -1,0 +1,80 @@
+/* src/styles/components/nav.css */
+
+/* =========================================
+   3. 极简实心胶囊悬浮导航栏 (参考图样式)
+   ========================================= */
+.glass-nav-container {
+  position: fixed;
+  top: 20px;
+  /* 稍微增加一点顶部呼吸感 */
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  /* 胶囊之间的间距 */
+  z-index: 50;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.glass-nav-container.nav-hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 统一的胶囊底板样式：更白、更实，取消明显边框 */
+.glass-pill {
+  /* 接近原图的暖白实心色，仅保留极其微弱的透明度 */
+  background-color: rgba(250, 250, 248, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: none;
+  border-radius: 50px;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  /* 内部元素的间距 */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  /* 非常轻柔的阴影 */
+  font-size: 0.9rem;
+  /* 原图字体较小且精致 */
+  color: var(--text-ink);
+  height: 44px;
+  /* 固定高度，让所有胶囊完美对齐 */
+  box-sizing: border-box;
+}
+
+/* 导航栏里的文字与图标互动效果 */
+.glass-pill span {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.glass-pill span:hover,
+.nav-link.active {
+  color: var(--accent-blue);
+}
+
+/* NavLink 样式 */
+.nav-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 暗色模式适配 */
+[data-theme='dark'] .glass-pill {
+  background-color: rgba(40, 40, 40, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .nav-link.active {
+  color: var(--accent-blue);
+}
