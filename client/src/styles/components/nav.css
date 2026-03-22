@@ -5,8 +5,7 @@
    ========================================= */
 .glass-nav-container {
   position: fixed;
-  top: 20px;
-  /* 稍微增加一点顶部呼吸感 */
+  /* top 值现在由 Framer Motion 动画控制 */
   left: 0;
   width: 100%;
   display: flex;
@@ -15,28 +14,16 @@
   gap: 12px;
   /* 胶囊之间的间距 */
   z-index: 50;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.glass-nav-container.nav-hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
+  /* 取消 CSS 自带的 transition，因为 Framer Motion 接管了数值变化 */
 }
 
 /* 统一的胶囊底板样式：更白、更实，取消明显边框 */
 .glass-pill {
-  /* 接近原图的暖白实心色，仅保留极其微弱的透明度 */
-  background-color: rgba(250, 250, 248, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: none;
+  /* 背景色现在由 React 动画控制 rgba */
   border-radius: 50px;
-  padding: 8px 24px;
+  /* padding 和 gap 现在由 React 动画控制 */
   display: flex;
   align-items: center;
-  gap: 18px;
-  /* 内部元素的间距 */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
   /* 非常轻柔的阴影 */
   font-size: 0.9rem;
@@ -45,6 +32,16 @@
   height: 44px;
   /* 固定高度，让所有胶囊完美对齐 */
   box-sizing: border-box;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: none;
+}
+
+/* Logo 胶囊特殊样式 */
+.logo-pill {
+  padding-left: 6px;
+  padding-right: 20px;
+  gap: 10px;
 }
 
 /* 导航栏里的文字与图标互动效果 */
@@ -68,6 +65,19 @@
   color: inherit;
 }
 
+/* 导航项里的 b 标签，取消加粗，利于文字变淡时的视觉清晰度 */
+.nav-link b {
+  font-weight: normal;
+}
+
+/* 导航栏内部竖线分割 */
+.nav-divider {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(0, 0, 0, 0.15);
+  margin: 0 2px;
+}
+
 /* 暗色模式适配 */
 [data-theme='dark'] .glass-pill {
   background-color: rgba(40, 40, 40, 0.85);
@@ -77,4 +87,8 @@
 
 [data-theme='dark'] .nav-link.active {
   color: var(--accent-blue);
+}
+
+[data-theme='dark'] .nav-divider {
+  background-color: rgba(255, 255, 255, 0.15);
 }
