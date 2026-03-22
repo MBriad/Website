@@ -109,10 +109,10 @@
 
    ### 第三步 — CRUD 接口（受 auth 保护）
 
-   - [ ] **文章 CRUD**：为 `articles.ts` 添加 POST、PUT、DELETE 路由，使用 `authMiddleware` 保护
-   - [ ] **项目 CRUD**：为 `projects.ts` 添加 POST、PUT、DELETE 路由
-   - [ ] **友链 CRUD**：为 `links.ts` 添加 POST、PUT、DELETE 路由
-   - [ ] **配置 CRUD**：为 `config.ts` 添加 PUT 路由（更新网站配置）
+   - [x] **文章 CRUD**：为 `articles.ts` 添加 POST、PUT、DELETE 路由，使用 `authMiddleware` 保护
+   - [x] **项目 CRUD**：为 `projects.ts` 添加 POST、PUT、DELETE 路由
+   - [x] **友链 CRUD**：为 `links.ts` 添加 POST、PUT、DELETE 路由
+   - [x] **配置 CRUD**：为 `config.ts` 添加 PUT 路由（更新网站配置）
 
    ### 第四步 — 管理端前端
 
