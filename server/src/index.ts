@@ -8,6 +8,7 @@ import { articleRoutes } from './routes/articles.js';
 import { projectRoutes } from './routes/projects.js';
 import { linkRoutes } from './routes/links.js';
 import { configRoutes } from './routes/config.js';
+import { authRoutes } from './routes/auth.js';
 
 // 加载环境变量
 dotenv.config();
@@ -28,13 +29,30 @@ async function registerPlugins() {
   await fastify.register(helmet);
 
   await fastify.register(rateLimit, {
-    max: 100,
-    timeWindow: '1 minute'
+    // 开发环境不限制，生产环境限制 500 次/分钟
+    max: process.env.NODE_ENV === 'development' ? 1000 : 500,
+    timeWindow: '1 minute',
+    // 自定义错误响应
+    errorResponseBuilder: function (request, context) {
+      return {
+        statusCode: 429,
+        error: 'Too Many Requests',
+        message: `请求过于频繁，请稍后重试`,
+        retryAfter: context.after
+      };
+    },
+    // 添加请求头
+    addHeaders: {
+      'x-ratelimit-limit': true,
+      'x-ratelimit-remaining': true,
+      'x-ratelimit-reset': true
+    }
   });
 }
 
 // 注册路由
 async function registerRoutes() {
+  await fastify.register(authRoutes);
   await fastify.register(articleRoutes);
   await fastify.register(projectRoutes);
   await fastify.register(linkRoutes);

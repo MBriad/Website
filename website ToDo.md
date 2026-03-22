@@ -1,194 +1,160 @@
-## 个人网站项目规划
+1. ## 个人网站项目规划 (V3.0 全栈联调版)
 
-### 技术栈
+   ### 技术栈
 
-**前端 (React)**
-- React 19 + Vite 6
-- React Router 7 (SPA路由)
-- Zustand 5 (状态管理)
-- Framer Motion 12 (动画)
+   **前端 (React - 大堂)**
+   - React 19 + Vite 6
+   - React Router 7 (SPA路由)
+   - Zustand 5 (状态管理)
+   - Framer Motion 12 (动画)
+   - **Axios (网络请求客户端)** 🆕
 
-**后端 (Node.js)** - 待开发
-- Express / Fastify
-- MongoDB / PostgreSQL
-- JWT (认证)
+   **后端 (Node.js - 后厨)**
+   - **Fastify (高性能框架)** 🆕
+   - MongoDB (数据库)
+   - JWT (身份认证)
 
----
+   ---
 
-## 前端开发任务
+   ## 前端开发任务
 
-### 已完成 ✅
+   ### 已完成 ✅
 
-**项目基础**
-- [x] 项目初始化 (Vite + React)
-- [x] 路由配置 (App.jsx)
-- [x] 超级权限插件配置 (opencode.json)
+   **项目基础**
+   - [x] 项目初始化 (Vite + React)
+   - [x] 路由配置 (App.jsx)
+   - [x] 超级权限插件配置 (opencode.json)
 
-**组件开发**
-- [x] NavBar.jsx - 导航栏组件（滚动收缩动画）
-- [x] SearchModal.jsx - 搜索弹窗组件
-- [x] ScrollProgress.jsx - 滚动进度条
-- [x] MusicPlayer.jsx - 音乐播放器
-- [x] BackToTop.jsx - 返回顶部按钮
-- [x] Footer.jsx - 页脚组件
-- [x] Icons.jsx - SVG 图标库
+   **组件开发**
+   - [x] NavBar.jsx - 导航栏组件（滚动收缩动画）
+   - [x] SearchModal.jsx - 搜索弹窗组件
+   - [x] ScrollProgress.jsx - 滚动进度条
+   - [x] MusicPlayer.jsx - 音乐播放器
+   - [x] BackToTop.jsx - 返回顶部按钮
+   - [x] Footer.jsx - 页脚组件
+   - [x] Icons.jsx - SVG 图标库
 
-**页面开发**
-- [x] Home.jsx - 首页（打字机语录 + 最新文章 + 特色项目）
-- [x] Category.jsx - 文章分类/归档页（标签筛选 + 时间线视图）
-- [x] About.jsx - 关于我页面（个人介绍 + 联系方式）
-- [x] Links.jsx - 友链页面（卡片网格 + 申请入口）
-- [x] Chip.jsx - 硬件项目展示（项目卡片 + 技术栈标签）
+   **页面开发**
+   - [x] Home.jsx - 首页（打字机语录 + 最新文章 + 特色项目）
+   - [x] Category.jsx - 文章分类/归档页（标签筛选 + 时间线视图）
+   - [x] About.jsx - 关于我页面（个人介绍 + 联系方式）
+   - [x] Links.jsx - 友链页面（卡片网格 + 申请入口）
+   - [x] Chip.jsx - 硬件项目展示（项目卡片 + 技术栈标签）
 
-**样式系统**
-- [x] CSS 模块化重构（variables.css + global.css + 组件样式）
-- [x] 暗色/亮色主题切换
-- [x] 响应式基础样式
+   **样式系统**
+   - [x] CSS 模块化重构（variables.css + global.css + 组件样式）
+   - [x] 暗色/亮色主题切换
+   - [x] 响应式基础样式
 
-**功能特性**
-- [x] 导航栏滚动收缩动画
-- [x] 页面切换过渡动画
-- [x] 卡片淡入动画
-- [x] 打字机语录效果
+   **功能特性**
+   - [x] 导航栏滚动收缩动画
+   - [x] 页面切换过渡动画
+   - [x] 卡片淡入动画
+   - [x] 打字机语录效果
 
-**数据文件**
-- [x] articles.json - 文章数据
-- [x] projects.json - 项目数据
-- [x] siteConfig.json - 网站配置
-- [x] links.json - 友链数据
-- [x] playlist.json - 音乐播放列表
+   **数据文件 (本地静态版)**
+   - [x] articles.json - 文章数据
+   - [x] projects.json - 项目数据
+   - [x] siteConfig.json - 网站配置
+   - [x] links.json - 友链数据
+   - [x] playlist.json - 音乐播放列表
 
-### 进行中 🔄
-- [ ] 全局搜索功能完善
+   ---
 
-### 待开发 📋
+   ## 全栈待开发任务 📋 (按执行顺序重新排列)
 
-**P0 - 高优先级**
-- [ ] 响应式布局适配（移动端优化）
-- [ ] SEO 元信息配置（meta tags）
+   ### 🚨 紧急修复任务 (最高优)
 
-**P1 - 中优先级**
-- [ ] 全局搜索功能完善（文章 + 项目搜索）
-- [ ] 文章详情页开发
-- [ ] 项目详情页开发
+   - [x] **修复 React 无限死循环**：检查 `Home.jsx` 等页面，确保 `fetch` 或 `axios` 调用被包裹在 `useEffect(..., [])` 中，必须带有空数组依赖。
 
-**P2 - 低优先级**
-- [ ] 后端 API 开发
-- [ ] 数据库设计
-- [ ] 管理员后台
+   ### P0 - 完美门面 (移动端与 SEO)
 
----
+   - [x] **响应式布局适配**：确保 NavBar 折叠菜单生效，卡片在手机端自动变为单列显示，优化触摸热区。
+   - [x] **SEO 与 Open Graph 配置**：在 `index.html` 添加基础 `meta` 标签（`og:title`, `og:image` 等），确保社交软件分享时展示精美卡片。
 
-## 后端开发任务
+   ### P1 - 铺设通信管道 (前后端网络联调) 🔌
 
-### 数据库设计 (MongoDB)
+   - [x] **后端通信基础 (Fastify)**：初始化 Fastify 项目，安装并配置 `@fastify/cors` 允许 `localhost:5173` 跨域访问。写一个测试接口 `GET /api/articles`。
+   - [x] **前端通信基础 (Axios)**：封装 `src/api/index.js`，配置全局 `baseURL: 'http://localhost:3000/api'`。
+     - 注意：旧 `src/api.js`（fetch 版）仍残留，建议清理，页面已统一使用 `api/index.js`。
+   - [x] **数据动态替换**：把前端读取本地 `.json` 的代码，全部替换为通过 Axios 向 Fastify 请求真实数据。
+   - [x] **加载与错误状态 (UX)**：开发日系简约风的"加载中..."动画；添加网络请求失败时的优雅错误提示 (Error Boundary)。
 
-**Article (文章)**
-```javascript
-{
-  _id: ObjectId,
-  title: String,
-  slug: String,           // URL友好标识
-  content: String,        // Markdown内容
-  excerpt: String,        // 摘要
-  cover: String,          // 封面图
-  tags: [String],         // 标签
-  category: String,       // 分类
-  published: Boolean,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+   ### P2 - 真实数据与仓库建设 (数据库)
+   - [x] **连接 MongoDB**：在 Fastify 中集成 Mongoose 或官方驱动，连接本地 MongoDB 数据库。
+   - [x] **数据播种 (Seed)**：编写 Node.js 脚本，把现有的 `articles.json` 等本地数据一键导入到 MongoDB 中。
+   - [x] **开发真实 RESTful API**：
+     - `GET /api/articles` (列表及分页)
+     - `GET /api/articles/:slug` (单篇文章)
+     - `GET /api/projects` 等...
 
-**Project (项目)**
-```javascript
-{
-  _id: ObjectId,
-  title: String,
-  description: String,
-  cover: String,
-  techStack: [String],    // 技术栈
-  github: String,          // GitHub链接
-  demo: String,            // 演示链接
-  featured: Boolean,       // 是否精选
-  createdAt: Date
-}
-```
+   ---
 
-**Link (友链)**
-```javascript
-{
-  _id: ObjectId,
-  name: String,
-  url: String,
-  avatar: String,
-  description: String,
-  createdAt: Date
-}
-```
+   ## 待办执行计划 🚀 (按优先级排列)
 
-**SiteConfig (网站配置)**
-```javascript
-{
-  _id: ObjectId,
-  avatar: String,
-  nickname: String,
-  bio: String,
-  socialLinks: {
-    github: String,
-    email: String,
-    twitter: String
-  }
-}
-```
+   ### 第一步 — Markdown 渲染 + 文章详情页接入 API
 
-### API 接口设计
+   - [x] **安装 react-markdown**：`npm install react-markdown`
+   - [x] **改造 ArticleDetail.jsx**：从读本地 `articles.json` 改为调用 `articleAPI.getBySlug(slug)`
+   - [x] **渲染 Markdown 内容**：用 `<ReactMarkdown>` 渲染 `article.content`，支持代码块等基础格式
+   - [ ] **（可选）代码高亮**：引入 `react-syntax-highlighter` 实现代码语法高亮
 
-**文章**
-- `GET /api/articles` - 获取文章列表 (支持分页、标签筛选)
-- `GET /api/articles/:slug` - 获取单篇文章
-- `GET /api/articles/featured` - 获取精选文章
+   ### 第二步 — JWT 登录接口
 
-**项目**
-- `GET /api/projects` - 获取项目列表
-- `GET /api/projects/:id` - 获取单个项目
+   - [x] **创建 `server/src/routes/auth.ts`**：实现 `POST /api/login` 接口
+     - 从 `.env` 读取管理员账号密码
+     - 使用 bcrypt 验证密码
+     - 成功返回 JWT token
+   - [x] **注册 auth 路由**：在 `server/src/index.ts` 的 `registerRoutes()` 中添加
 
-**友链**
-- `GET /api/links` - 获取友链列表
+   ### 第三步 — CRUD 接口（受 auth 保护）
 
-**配置**
-- `GET /api/config` - 获取网站配置
+   - [ ] **文章 CRUD**：为 `articles.ts` 添加 POST、PUT、DELETE 路由，使用 `authMiddleware` 保护
+   - [ ] **项目 CRUD**：为 `projects.ts` 添加 POST、PUT、DELETE 路由
+   - [ ] **友链 CRUD**：为 `links.ts` 添加 POST、PUT、DELETE 路由
+   - [ ] **配置 CRUD**：为 `config.ts` 添加 PUT 路由（更新网站配置）
 
-### 待开发
-- [ ] 后端项目初始化
-- [ ] 数据库连接配置
-- [ ] RESTful API 开发
-- [ ] 数据迁移/填充脚本
-- [ ] 管理员后台
+   ### 第四步 — 管理端前端
 
----
+   - [ ] **创建登录页**：`client/src/pages/Login.jsx`，表单提交到 `POST /api/login`，存储 token 到 localStorage
+   - [ ] **创建管理页**：`client/src/pages/Admin.jsx`，文章/项目/友链列表 + 增删改表单
+   - [ ] **添加路由**：在 `App.jsx` 中添加 `/login` 和 `/admin` 路由
+   - [ ] **Axios 拦截器**：取消注释 `api/index.js` 中的 token 注入逻辑
 
-## 部署方案
+   ### 第五步 — Markdown 编辑器
 
-**前端**
-- Vercel / Netlify (静态部署)
-- 域名绑定
-- SSL证书
+   - [ ] **安装 react-md-editor**：`npm install @uiw/react-md-editor`
+   - [ ] **集成到 Admin 页**：在文章编辑表单中使用 `<MDEditor>`，左侧编辑右侧预览
 
-**后端**
-- Railway / Render / VPS
-- PM2 进程管理
-- Nginx 反向代理
+   ### 第六步 — 图片处理
 
----
+   - [ ] **安装 sharp**：在 `server/` 目录下 `npm install sharp`
+   - [ ] **创建图片上传路由**：`POST /api/upload`，接收图片后自动压缩转码为 `.webp`
+   - [ ] **前端上传组件**：在管理端编辑表单中添加图片上传
 
-## 开发优先级
+   ### 第七步 — 部署上线
 
-1. **P0** - 响应式布局适配
-2. **P0** - SEO 元信息配置
-3. **P1** - 全局搜索功能完善
-4. **P1** - 文章详情页开发
-5. **P2** - 后端 API 开发
-6. **P2** - 数据库设计
-7. **P3** - 管理员后台
-8. **P3** - 部署配置
+   - [ ] **环境变量分离**：创建 `.env.development` 和 `.env.production`，区分 API 域名
+   - [ ] **前端部署**：配置 `vite.config.js`，推送至 Vercel 绑定域名
+   - [ ] **后端部署**：配置启动脚本，部署至 Railway 或 Render
+   - [ ] **数据库上云**：迁移至 MongoDB Atlas，配置网络白名单
+
+   ---
+
+   ## 附录：数据库设计 Schema 参考 (MongoDB)
+
+   **Article (文章)**
+   ```javascript
+   {
+     _id: ObjectId,
+     title: String,
+     slug: String,           // URL友好标识
+     content: String,        // 存放原始 Markdown 字符串 🆕
+     excerpt: String,        // 摘要
+     cover: String,          // 封面图 (存 WebP URL) 🆕
+     tags: [String],         // 标签
+     category: String,       // 分类
+     published: Boolean,
+     createdAt: Date,
+     updatedAt: Date
+   }
