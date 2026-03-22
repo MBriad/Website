@@ -142,3 +142,109 @@
 [data-theme='dark'] .timeline-dot {
   border-color: var(--bg-paper);
 }
+
+/* =========================================
+   响应式布局
+   ========================================= */
+
+/* 移动端 (< 768px) */
+@media (max-width: 768px) {
+  .category-container {
+    padding: 100px 16px 8vh;
+  }
+  
+  .tag-filter {
+    gap: 8px;
+    margin-bottom: 30px;
+  }
+  
+  .tag-pill {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    gap: 3px;
+  }
+  
+  .timeline-group {
+    margin-bottom: 24px;
+  }
+  
+  .timeline-month {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    padding-left: 12px;
+  }
+  
+  .timeline-line {
+    padding-left: 16px;
+  }
+  
+  .timeline-article {
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+  
+  .timeline-dot {
+    left: -23px;
+    top: 20px;
+    width: 8px;
+    height: 8px;
+  }
+  
+  .timeline-date {
+    font-size: 0.75rem;
+  }
+  
+  .timeline-title {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  
+  .timeline-excerpt {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  
+  .timeline-tags {
+    gap: 6px;
+  }
+  
+  .timeline-tag {
+    font-size: 0.7rem;
+    gap: 2px;
+  }
+  
+  .timeline-empty {
+    padding: 40px 0;
+    font-size: 0.9rem;
+  }
+}
+
+/* 平板 (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .category-container {
+    max-width: 700px;
+    padding: 110px 30px 10vh;
+  }
+  
+  .timeline-month {
+    padding-left: 16px;
+  }
+  
+  .timeline-line {
+    padding-left: 20px;
+  }
+  
+  .timeline-dot {
+    left: -27px;
+  }
+}
+
+/* 桌面 (> 1024px) */
+@media (min-width: 1025px) {
+  .category-container {
+    max-width: 900px;
+    padding: 120px 40px 10vh;
+  }
+}

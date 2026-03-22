@@ -15,6 +15,8 @@
   /* 胶囊之间的间距 */
   z-index: 50;
   /* 取消 CSS 自带的 transition，因为 Framer Motion 接管了数值变化 */
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 /* 统一的胶囊底板样式：更白、更实，取消明显边框 */
@@ -97,6 +99,102 @@
   background-color: rgba(160, 216, 239, 0.25);
 }
 
+/* =========================================
+   汉堡菜单按钮
+   ========================================= */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  z-index: 60;
+}
+
+.hamburger-menu span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background-color: var(--text-ink);
+  margin: 2px 0;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+
+.hamburger-menu.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* =========================================
+   移动端导航菜单
+   ========================================= */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--bg-paper);
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu .nav-link {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.mobile-menu .nav-link:hover,
+.mobile-menu .nav-link.active {
+  background-color: rgba(160, 216, 239, 0.15);
+}
+
+.mobile-menu .nav-link b {
+  font-weight: 500;
+}
+
+.mobile-menu .theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.mobile-menu .theme-toggle:hover {
+  background-color: rgba(160, 216, 239, 0.15);
+}
+
 /* 暗色模式适配 */
 [data-theme='dark'] .glass-pill {
   background-color: rgba(40, 40, 40, 0.85);
@@ -120,4 +218,78 @@
 
 [data-theme='dark'] .circle-btn:hover {
   background-color: rgba(60, 60, 60, 0.95);
+}
+
+[data-theme='dark'] .hamburger-menu span {
+  background-color: var(--text-ink);
+}
+
+[data-theme='dark'] .mobile-menu {
+  background-color: var(--bg-paper);
+}
+
+/* =========================================
+   响应式布局
+   ========================================= */
+
+/* 移动端 (< 768px) */
+@media (max-width: 768px) {
+  .glass-nav-container {
+    justify-content: space-between;
+    padding: 0 16px;
+  }
+  
+  .glass-pill.nav-pill {
+    display: none;
+  }
+  
+  .hamburger-menu {
+    display: flex;
+  }
+  
+  .glass-pill.logo-pill {
+    padding: 6px 12px;
+    gap: 8px;
+  }
+  
+  .glass-pill.logo-pill img {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  .glass-pill.logo-pill span {
+    display: none;
+  }
+  
+  .circle-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* 平板 (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .glass-nav-container {
+    gap: 8px;
+  }
+  
+  .glass-pill {
+    padding: 6px 16px;
+    gap: 12px;
+  }
+  
+  .glass-pill.nav-pill {
+    gap: 8px;
+  }
+  
+  .hamburger-menu {
+    display: none;
+  }
+}
+
+/* 桌面 (> 1024px) */
+@media (min-width: 1025px) {
+  .hamburger-menu {
+    display: none;
+  }
 }

@@ -19,6 +19,17 @@
   --text-tertiary: #777;
   --text-muted: #888;
   --text-light: #999;
+  
+  /* 响应式断点 */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  
+  /* 移动端字体大小 */
+  --font-size-mobile-base: 14px;
+  --font-size-mobile-lg: 16px;
+  --font-size-mobile-xl: 18px;
 }
 
 [data-theme='dark'] {

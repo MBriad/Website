@@ -9,6 +9,7 @@ body {
   font-family: 'Klee One', "Noto Serif SC", "Songti SC", serif;
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 h1,
@@ -18,6 +19,26 @@ h4,
 h5,
 h6 {
   color: var(--text-ink);
+}
+
+/* 移动端基础样式 */
+@media (max-width: 768px) {
+  body {
+    font-size: var(--font-size-mobile-base);
+    line-height: 1.6;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.3rem;
+  }
+  
+  h3 {
+    font-size: 1.1rem;
+  }
 }
 
 /* 优雅的文本选中状态 */
