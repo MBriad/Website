@@ -116,10 +116,10 @@
 
    ### 第四步 — 管理端前端
 
-   - [ ] **创建登录页**：`client/src/pages/Login.jsx`，表单提交到 `POST /api/login`，存储 token 到 localStorage
-   - [ ] **创建管理页**：`client/src/pages/Admin.jsx`，文章/项目/友链列表 + 增删改表单
-   - [ ] **添加路由**：在 `App.jsx` 中添加 `/login` 和 `/admin` 路由
-   - [ ] **Axios 拦截器**：取消注释 `api/index.js` 中的 token 注入逻辑
+   - [x] **创建登录页**：`client/src/pages/Login.jsx`，表单提交到 `POST /api/login`，存储 token 到 localStorage
+   - [x] **创建管理页**：`client/src/pages/Admin.jsx`，文章/项目/友链列表 + 增删改表单
+   - [x] **添加路由**：在 `App.jsx` 中添加 `/login` 和 `/admin` 路由
+   - [x] **Axios 拦截器**：取消注释 `api/index.js` 中的 token 注入逻辑
 
    ### 第五步 — Markdown 编辑器
 

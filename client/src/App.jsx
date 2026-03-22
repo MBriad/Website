@@ -8,7 +8,6 @@
 
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import NavBar from './components/NavBar';
 import SearchModal from './components/SearchModal';
 import ScrollProgress from './components/ScrollProgress';
@@ -21,18 +20,9 @@ import About from './pages/About';
 import Links from './pages/Links';
 import Chip from './pages/Chip';
 import ArticleDetail from './pages/ArticleDetail';
+import Login from './pages/Login';
+import Admin from './pages/Admin';
 import useStore from './store/useStore';
-
-const PageWrapper = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.3 }}
-  >
-    {children}
-  </motion.div>
-);
 
 function App() {
   const isSearchOpen = useStore((state) => state.isSearchOpen);
@@ -71,16 +61,16 @@ function App() {
       <BackToTop />
       <NavBar setIsSearchOpen={setIsSearchOpen} />
 
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-            <Route path="/category" element={<PageWrapper><Category /></PageWrapper>} />
-            <Route path="/article/:slug" element={<PageWrapper><ArticleDetail /></PageWrapper>} />
-            <Route path="/links" element={<PageWrapper><Links /></PageWrapper>} />
-            <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
-            <Route path="/chip" element={<PageWrapper><Chip /></PageWrapper>} />
-          </Routes>
-        </AnimatePresence>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/category" element={<Category />} />
+        <Route path="/article/:slug" element={<ArticleDetail />} />
+        <Route path="/links" element={<Links />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/chip" element={<Chip />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
 
       <Footer />
     </>
