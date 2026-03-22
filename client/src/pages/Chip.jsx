@@ -1,6 +1,7 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GithubIcon, ArrowIcon } from '../Icons';
-import projectsData from '../data/projects.json';
+import { projectAPI } from '../api.js';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -20,6 +21,65 @@ const itemVariants = {
 };
 
 const Chip = () => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 从 API 获取项目数据
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await projectAPI.getList();
+        setProjects(data || []);
+      } catch (err) {
+        console.error('Failed to fetch projects:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // 加载状态
+  if (loading) {
+    return (
+      <motion.main
+        className="chip-container"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="chip-grid">
+          <div className="chip-card">加载中...</div>
+        </div>
+      </motion.main>
+    );
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <motion.main
+        className="chip-container"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="chip-grid">
+          <div className="chip-card" style={{ color: '#ff6b6b' }}>
+            加载失败: {error}
+          </div>
+        </div>
+      </motion.main>
+    );
+  }
+
   return (
     <motion.main
       className="chip-container"
@@ -28,25 +88,24 @@ const Chip = () => {
       animate="visible"
     >
       <motion.h1 variants={itemVariants} className="page-title">
-        <span className="highlight-blue">项目</span>
+        奇妙小<span className="highlight-blue">玩具</span>
       </motion.h1>
 
       <div className="chip-grid">
-        {projectsData.projects.map((project) => (
+        {projects.map(project => (
           <motion.div
-            key={project.id}
+            key={project._id}
             variants={itemVariants}
-            whileHover={{ y: -5 }}
             className="chip-card"
           >
             {project.featured && (
-              <span className="chip-featured">精选</span>
+              <div className="chip-featured">精选</div>
             )}
             <h3 className="chip-title">{project.title}</h3>
             <p className="chip-desc">{project.description}</p>
             <div className="chip-tech">
-              {project.tech.map(t => (
-                <span key={t} className="tech-badge">{t}</span>
+              {project.techStack.map(tech => (
+                <span key={tech} className="tech-badge">{tech}</span>
               ))}
             </div>
             <div className="chip-links">

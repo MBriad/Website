@@ -1,42 +1,58 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowIcon, TagIcon } from '../Icons';
-import articlesData from '../data/articles.json';
-import projectsData from '../data/projects.json';
+import { searchAPI } from '../api.js';
 
 const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState({ articles: [], projects: [] });
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
   const resultsRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
 
-  const results = useMemo(() => {
-    if (!query.trim()) return { articles: [], projects: [] };
-    const q = query.toLowerCase();
+  // 防抖搜索
+  const performSearch = useCallback(async (searchQuery) => {
+    if (!searchQuery.trim()) {
+      setResults({ articles: [], projects: [] });
+      return;
+    }
 
-    const articles = articlesData.articles.filter(a =>
-      a.title.toLowerCase().includes(q) ||
-      a.excerpt.toLowerCase().includes(q) ||
-      a.tags.some(t => t.toLowerCase().includes(q))
-    );
+    setIsSearching(true);
+    try {
+      const searchResults = await searchAPI.search(searchQuery);
+      setResults(searchResults);
+    } catch (error) {
+      console.error('Search failed:', error);
+      setResults({ articles: [], projects: [] });
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
 
-    const projects = projectsData.projects.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q) ||
-      p.tech.some(t => t.toLowerCase().includes(q))
-    );
+  // 处理输入变化
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    setSelectedIndex(-1);
 
-    return { articles, projects };
-  }, [query]);
+    // 清除之前的定时器
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // 设置新的防抖定时器
+    searchTimeoutRef.current = setTimeout(() => {
+      performSearch(value);
+    }, 300);
+  };
 
   // 扁平化的所有结果，用于键盘导航
-  const allResults = useMemo(() => {
-    const items = [];
-    results.articles.forEach(a => items.push({ type: 'article', data: a }));
-    results.projects.forEach(p => items.push({ type: 'project', data: p }));
-    return items;
-  }, [results]);
+  const allResults = [];
+  results.articles.forEach(a => allResults.push({ type: 'article', data: a }));
+  results.projects.forEach(p => allResults.push({ type: 'project', data: p }));
 
   // 键盘导航
   useEffect(() => {
@@ -58,7 +74,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
           e.preventDefault();
           if (selectedIndex >= 0 && selectedIndex < allResults.length) {
             const item = allResults[selectedIndex];
-            goTo(item.type === 'article' ? '/category' : '/chip');
+            goTo(item.type === 'article' ? `/article/${item.data.slug}` : '/chip');
           }
           break;
         case 'Escape':
@@ -81,9 +97,19 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
     }
   }, [selectedIndex]);
 
+  // 清理定时器
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleClose = () => {
     setQuery('');
     setSelectedIndex(-1);
+    setResults({ articles: [], projects: [] });
     setIsSearchOpen(false);
   };
 
@@ -136,10 +162,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
               className="search-input"
               placeholder="搜索物语..."
               value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setSelectedIndex(-1);
-              }}
+              onChange={handleInputChange}
             />
 
             {/* 搜索建议 */}
@@ -151,7 +174,10 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                     <motion.span
                       key={tag}
                       className="search-suggestion-tag"
-                      onClick={() => setQuery(tag)}
+                      onClick={() => {
+                        setQuery(tag);
+                        performSearch(tag);
+                      }}
                       whileHover={{ scale: 1.05 }}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -167,7 +193,11 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
             {/* 搜索结果 */}
             {hasQuery && (
               <div className="search-results" ref={resultsRef}>
-                {!hasResults && (
+                {isSearching && (
+                  <div className="search-empty">搜索中...</div>
+                )}
+
+                {!isSearching && !hasResults && (
                   <div className="search-empty">
                     <div className="search-empty-icon">🔍</div>
                     <div className="search-empty-text">未找到相关内容</div>
@@ -177,7 +207,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                   </div>
                 )}
 
-                {results.articles.length > 0 && (
+                {!isSearching && results.articles.length > 0 && (
                   <div className="search-group">
                     <div className="search-group-title">
                       文章 ({results.articles.length})
@@ -186,7 +216,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                       const globalIdx = idx;
                       return (
                         <div
-                          key={a.id}
+                          key={a._id}
                           className={`search-result-item ${selectedIndex === globalIdx ? 'selected' : ''}`}
                           onClick={() => goTo(`/article/${a.slug}`)}
                           onMouseEnter={() => setSelectedIndex(globalIdx)}
@@ -210,7 +240,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                   </div>
                 )}
 
-                {results.projects.length > 0 && (
+                {!isSearching && results.projects.length > 0 && (
                   <div className="search-group">
                     <div className="search-group-title">
                       项目 ({results.projects.length})
@@ -219,7 +249,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                       const globalIdx = results.articles.length + idx;
                       return (
                         <div
-                          key={p.id}
+                          key={p._id}
                           className={`search-result-item ${selectedIndex === globalIdx ? 'selected' : ''}`}
                           onClick={() => goTo('/chip')}
                           onMouseEnter={() => setSelectedIndex(globalIdx)}
@@ -231,7 +261,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                             {highlightText(p.description, query)}
                           </div>
                           <div className="search-result-tech">
-                            {p.tech.map(t => (
+                            {p.techStack.map(t => (
                               <span key={t} className="tech-badge">{t}</span>
                             ))}
                           </div>

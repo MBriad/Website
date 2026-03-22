@@ -1,11 +1,9 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { GithubIcon, MailIcon, ArrowIcon, TagIcon } from '../Icons';
 import useTypewriter from '../hooks/useTypewriter';
-import articlesData from '../data/articles.json';
-import projectsData from '../data/projects.json';
-import siteConfig from '../data/siteConfig.json';
+import { articleAPI, projectAPI, configAPI } from '../api.js';
 
 const QUOTES = [
   '忙点好啊，会发现忙里偷闲才是本事',
@@ -13,9 +11,6 @@ const QUOTES = [
   '每一次重构，都是与过去的自己和解',
   '在字节之间，寻找属于自己的节奏',
 ];
-
-const articles = articlesData.articles.slice(0, 5);
-const projects = projectsData.projects.filter(p => p.featured);
 
 const FadeInCard = ({ children, className, style, whileHover }) => {
   const ref = useRef(null);
@@ -48,7 +43,73 @@ const FadeInCard = ({ children, className, style, whileHover }) => {
 };
 
 const Home = () => {
-  const { displayText } = useTypewriter(QUOTES);
+  const contentRef = useRef(null);
+  const quote = useTypewriter(QUOTES);
+  
+  // 状态管理
+  const [articles, setArticles] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [siteConfig, setSiteConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 从 API 获取数据
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 并行获取文章、项目和网站配置
+        const [articlesRes, projectsRes, configRes] = await Promise.all([
+          articleAPI.getList({ limit: 5 }),
+          projectAPI.getList(),
+          configAPI.get(),
+        ]);
+
+        // 设置文章数据
+        setArticles(articlesRes.data || []);
+
+        // 设置项目数据（筛选精选项目）
+        const featuredProjects = (projectsRes || []).filter(p => p.featured);
+        setProjects(featuredProjects);
+
+        // 设置网站配置
+        setSiteConfig(configRes);
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // 加载状态
+  if (loading) {
+    return (
+      <main className="home-container">
+        <section className="hero-section">
+          <div className="typewriter-quote">加载中...</div>
+        </section>
+      </main>
+    );
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <main className="home-container">
+        <section className="hero-section">
+          <div className="typewriter-quote" style={{ color: '#ff6b6b' }}>
+            加载失败: {error}
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="home-container">
@@ -64,7 +125,7 @@ const Home = () => {
         />
 
         <div className="typewriter-quote">
-          {displayText}
+          {quote}
           <span className="typewriter-cursor"></span>
         </div>
 
@@ -75,7 +136,7 @@ const Home = () => {
           transition={{ delay: 1.2, duration: 0.8 }}
         >
           <motion.a
-            href="https://github.com"
+            href={siteConfig?.socialLinks?.github || "https://github.com"}
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ y: -2 }}
@@ -84,7 +145,7 @@ const Home = () => {
             <GithubIcon /> GitHub
           </motion.a>
           <motion.a
-            href="mailto:example@email.com"
+            href={siteConfig?.socialLinks?.email || "mailto:example@email.com"}
             whileHover={{ y: -2 }}
             className="hero-link"
           >
@@ -104,25 +165,27 @@ const Home = () => {
       </section>
 
       {/* 个人介绍区域 */}
-      <section className="intro-section">
-        <FadeInCard className="intro-card">
-          <h2 style={{ fontSize: '1.3rem', fontWeight: 600, marginBottom: '16px' }}>
-            关于<span className="highlight-blue">我</span>
-          </h2>
-          <div className="intro-content">
-            {siteConfig.bio.split('\n\n').map((paragraph, index) => (
-              <p key={index} className="intro-paragraph">{paragraph}</p>
-            ))}
-          </div>
-          <div className="intro-links">
-            <Link to="/about" className="intro-link">
-              <motion.span whileHover={{ x: 5 }}>
-                了解更多 <ArrowIcon />
-              </motion.span>
-            </Link>
-          </div>
-        </FadeInCard>
-      </section>
+      {siteConfig && (
+        <section className="intro-section">
+          <FadeInCard className="intro-card">
+            <h2 style={{ fontSize: '1.3rem', fontWeight: 600, marginBottom: '16px' }}>
+              关于<span className="highlight-blue">我</span>
+            </h2>
+            <div className="intro-content">
+              {siteConfig.bio.split('\n\n').map((paragraph, index) => (
+                <p key={index} className="intro-paragraph">{paragraph}</p>
+              ))}
+            </div>
+            <div className="intro-links">
+              <Link to="/about" className="intro-link">
+                <motion.span whileHover={{ x: 5 }}>
+                  了解更多 <ArrowIcon />
+                </motion.span>
+              </Link>
+            </div>
+          </FadeInCard>
+        </section>
+      )}
 
       {/* 下方内容区 */}
       <div className="content-section">
@@ -143,14 +206,14 @@ const Home = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {articles.map((article) => (
-              <Link key={article.id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link key={article._id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <FadeInCard whileHover={{ x: 5 }}>
                   <h3 style={{ fontWeight: 500, marginBottom: '6px', fontSize: '1.1rem' }}>
                     {article.title}
                   </h3>
                   <p className="article-excerpt">{article.excerpt}</p>
                   <div className="article-meta">
-                    <span>{article.date}</span>
+                    <span>{new Date(article.createdAt).toLocaleDateString('zh-CN')}</span>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       {article.tags.map(tag => (
                         <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -182,11 +245,11 @@ const Home = () => {
 
           <div className="projects-grid">
             {projects.map((project) => (
-              <FadeInCard key={project.id} whileHover={{ y: -5 }}>
+              <FadeInCard key={project._id} whileHover={{ y: -5 }}>
                 <h3 style={{ fontWeight: 500, marginBottom: '8px' }}>{project.title}</h3>
                 <p className="project-desc">{project.description}</p>
                 <div className="project-tech">
-                  {project.tech.map(t => (
+                  {project.techStack.map(t => (
                     <span key={t} className="tech-badge">{t}</span>
                   ))}
                 </div>
