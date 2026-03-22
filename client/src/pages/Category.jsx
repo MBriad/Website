@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { TagIcon } from '../Icons';
-import { articleAPI } from '../api.js';
+import { articleAPI } from '../api/index.js';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -101,6 +101,7 @@ const Category = () => {
 
   return (
     <motion.main
+      key="content"
       className="category-container"
       variants={containerVariants}
       initial="hidden"
@@ -134,35 +135,43 @@ const Category = () => {
       {/* 时间线 */}
       <motion.div variants={itemVariants} className="timeline">
         <AnimatePresence mode="wait">
-          {groupedByMonth.map(([month, articles]) => (
-            <div key={month} className="timeline-group">
-              <div className="timeline-month">{month}</div>
-              <div className="timeline-line">
-                {articles.map(article => (
-                  <Link key={article._id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <motion.div
-                      whileHover={{ x: 5 }}
-                      className="timeline-article"
-                    >
-                      <div className="timeline-dot"></div>
-                      <div className="timeline-content">
-                        <div className="timeline-date">{new Date(article.createdAt).toLocaleDateString('zh-CN')}</div>
-                        <h3 className="timeline-title">{article.title}</h3>
-                        <p className="timeline-excerpt">{article.excerpt}</p>
-                        <div className="timeline-tags">
-                          {article.tags.map(tag => (
-                            <span key={tag} className="timeline-tag">
-                              <TagIcon /> {tag}
-                            </span>
-                          ))}
+          <motion.div
+            key={activeTag || 'all'}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {groupedByMonth.map(([month, articles]) => (
+              <div key={month} className="timeline-group">
+                <div className="timeline-month">{month}</div>
+                <div className="timeline-line">
+                  {articles.map(article => (
+                    <Link key={article._id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <motion.div
+                        whileHover={{ x: 5 }}
+                        className="timeline-article"
+                      >
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
+                          <div className="timeline-date">{new Date(article.createdAt).toLocaleDateString('zh-CN')}</div>
+                          <h3 className="timeline-title">{article.title}</h3>
+                          <p className="timeline-excerpt">{article.excerpt}</p>
+                          <div className="timeline-tags">
+                            {article.tags.map(tag => (
+                              <span key={tag} className="timeline-tag">
+                                <TagIcon /> {tag}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  </Link>
-                ))}
+                      </motion.div>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </motion.div>
         </AnimatePresence>
 
         {filteredArticles.length === 0 && (

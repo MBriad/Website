@@ -86,7 +86,7 @@ const MusicPlayer = () => {
 
       <audio
         ref={audioRef}
-        src={currentTrack.src}
+        src={currentTrack.src || undefined}
         onEnded={handleEnded}
         preload="none"
       />

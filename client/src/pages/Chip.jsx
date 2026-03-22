@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GithubIcon, ArrowIcon } from '../Icons';
-import { projectAPI } from '../api.js';
+import { projectAPI } from '../api/index.js';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -82,6 +82,7 @@ const Chip = () => {
 
   return (
     <motion.main
+      key="content"
       className="chip-container"
       variants={containerVariants}
       initial="hidden"

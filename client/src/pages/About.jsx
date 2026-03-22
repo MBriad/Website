@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GithubIcon, MailIcon } from '../Icons';
-import { configAPI } from '../api.js';
+import { configAPI } from '../api/index.js';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -76,10 +76,11 @@ const About = () => {
     );
   }
 
-  const paragraphs = siteConfig.bio.split('\n\n');
+  const paragraphs = siteConfig.bio?.split('\n\n') || [];
 
   return (
     <motion.main
+      key="content"
       className="about-container"
       variants={containerVariants}
       initial="hidden"

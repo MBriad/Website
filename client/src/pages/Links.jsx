@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowIcon } from '../Icons';
-import { linkAPI } from '../api.js';
+import { linkAPI } from '../api/index.js';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -82,6 +82,7 @@ const Links = () => {
 
   return (
     <motion.main
+      key="content"
       className="links-container"
       variants={containerVariants}
       initial="hidden"
