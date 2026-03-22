@@ -74,6 +74,14 @@
   cursor: pointer;
 }
 
+.timeline-article:hover {
+  background-color: rgba(160, 216, 239, 0.1);
+}
+
+[data-theme='dark'] .timeline-article:hover {
+  background-color: rgba(122, 184, 212, 0.15);
+}
+
 .timeline-dot {
   position: absolute;
   left: -31px;

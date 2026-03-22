@@ -143,7 +143,7 @@ const Home = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {articles.map((article) => (
-              <FadeInCard key={article.id} whileHover={{ x: 5, backgroundColor: 'rgba(160, 216, 239, 0.1)' }}>
+              <FadeInCard key={article.id} whileHover={{ x: 5 }}>
                 <h3 style={{ fontWeight: 500, marginBottom: '6px', fontSize: '1.1rem' }}>
                   {article.title}
                 </h3>

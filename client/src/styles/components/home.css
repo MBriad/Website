@@ -172,6 +172,14 @@
   transform: translateY(0);
 }
 
+.fade-in-card:hover {
+  background-color: rgba(160, 216, 239, 0.1);
+}
+
+[data-theme='dark'] .fade-in-card:hover {
+  background-color: rgba(122, 184, 212, 0.15);
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;

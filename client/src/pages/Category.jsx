@@ -93,7 +93,7 @@ const Category = () => {
                   {articles.map(article => (
                     <motion.div
                       key={article.id}
-                      whileHover={{ x: 5, backgroundColor: 'rgba(160, 216, 239, 0.1)' }}
+                      whileHover={{ x: 5 }}
                       className="timeline-article"
                     >
                       <div className="timeline-dot"></div>
