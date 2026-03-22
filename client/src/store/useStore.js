@@ -18,7 +18,7 @@ const useStore = create((set) => ({
   toggleTheme: () => set((state) => {
     const next = state.theme === 'light' ? 'dark' : 'light';
     localStorage.setItem('theme', next);
-    document.documentElement.dataset.theme = next;
+    // 不在这里更新 DOM，让 App.jsx 的 useEffect 处理
     return { theme: next };
   }),
 
