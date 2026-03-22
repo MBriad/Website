@@ -20,6 +20,7 @@ import Category from './pages/Category';
 import About from './pages/About';
 import Links from './pages/Links';
 import Chip from './pages/Chip';
+import ArticleDetail from './pages/ArticleDetail';
 import useStore from './store/useStore';
 
 const PageWrapper = ({ children }) => (
@@ -70,15 +71,16 @@ function App() {
       <BackToTop />
       <NavBar setIsSearchOpen={setIsSearchOpen} />
 
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-          <Route path="/category" element={<PageWrapper><Category /></PageWrapper>} />
-          <Route path="/links" element={<PageWrapper><Links /></PageWrapper>} />
-          <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
-          <Route path="/chip" element={<PageWrapper><Chip /></PageWrapper>} />
-        </Routes>
-      </AnimatePresence>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+            <Route path="/category" element={<PageWrapper><Category /></PageWrapper>} />
+            <Route path="/article/:slug" element={<PageWrapper><ArticleDetail /></PageWrapper>} />
+            <Route path="/links" element={<PageWrapper><Links /></PageWrapper>} />
+            <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
+            <Route path="/chip" element={<PageWrapper><Chip /></PageWrapper>} />
+          </Routes>
+        </AnimatePresence>
 
       <Footer />
     </>

@@ -188,7 +188,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                         <div
                           key={a.id}
                           className={`search-result-item ${selectedIndex === globalIdx ? 'selected' : ''}`}
-                          onClick={() => goTo('/category')}
+                          onClick={() => goTo(`/article/${a.slug}`)}
                           onMouseEnter={() => setSelectedIndex(globalIdx)}
                         >
                           <div className="search-result-name">

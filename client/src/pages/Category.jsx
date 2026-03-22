@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { TagIcon } from '../Icons';
 import articlesData from '../data/articles.json';
 
@@ -91,25 +92,26 @@ const Category = () => {
                 <div className="timeline-month">{month}</div>
                 <div className="timeline-line">
                   {articles.map(article => (
-                    <motion.div
-                      key={article.id}
-                      whileHover={{ x: 5 }}
-                      className="timeline-article"
-                    >
-                      <div className="timeline-dot"></div>
-                      <div className="timeline-content">
-                        <div className="timeline-date">{article.date}</div>
-                        <h3 className="timeline-title">{article.title}</h3>
-                        <p className="timeline-excerpt">{article.excerpt}</p>
-                        <div className="timeline-tags">
-                          {article.tags.map(tag => (
-                            <span key={tag} className="timeline-tag">
-                              <TagIcon /> {tag}
-                            </span>
-                          ))}
+                    <Link key={article.id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <motion.div
+                        whileHover={{ x: 5 }}
+                        className="timeline-article"
+                      >
+                        <div className="timeline-dot"></div>
+                        <div className="timeline-content">
+                          <div className="timeline-date">{article.date}</div>
+                          <h3 className="timeline-title">{article.title}</h3>
+                          <p className="timeline-excerpt">{article.excerpt}</p>
+                          <div className="timeline-tags">
+                            {article.tags.map(tag => (
+                              <span key={tag} className="timeline-tag">
+                                <TagIcon /> {tag}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
+                      </motion.div>
+                    </Link>
                   ))}
                 </div>
               </div>

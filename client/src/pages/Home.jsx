@@ -143,22 +143,24 @@ const Home = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {articles.map((article) => (
-              <FadeInCard key={article.id} whileHover={{ x: 5 }}>
-                <h3 style={{ fontWeight: 500, marginBottom: '6px', fontSize: '1.1rem' }}>
-                  {article.title}
-                </h3>
-                <p className="article-excerpt">{article.excerpt}</p>
-                <div className="article-meta">
-                  <span>{article.date}</span>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    {article.tags.map(tag => (
-                      <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <TagIcon /> {tag}
-                      </span>
-                    ))}
+              <Link key={article.id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <FadeInCard whileHover={{ x: 5 }}>
+                  <h3 style={{ fontWeight: 500, marginBottom: '6px', fontSize: '1.1rem' }}>
+                    {article.title}
+                  </h3>
+                  <p className="article-excerpt">{article.excerpt}</p>
+                  <div className="article-meta">
+                    <span>{article.date}</span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {article.tags.map(tag => (
+                        <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <TagIcon /> {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </FadeInCard>
+                </FadeInCard>
+              </Link>
             ))}
           </div>
         </section>
