@@ -1,0 +1,40 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "title": "个人网站 v2.0",
+      "description": "日系轻小说风响应式个人博客，使用 React + Vite 构建，搭配玻璃拟态 UI 和 Framer Motion 动画。",
+      "tech": ["React", "Vite", "Zustand", "Framer Motion"],
+      "github": "https://github.com/MBri/website",
+      "demo": "https://mbri.dev",
+      "featured": true
+    },
+    {
+      "id": 2,
+      "title": "ESP32 温湿度监控系统",
+      "description": "基于 ESP32 的物联网项目，通过 MQTT 协议将温湿度数据上传至云端，支持实时图表展示和异常告警。",
+      "tech": ["ESP32", "Arduino", "MQTT", "Node.js"],
+      "github": "https://github.com/MBri/esp32-monitor",
+      "demo": null,
+      "featured": true
+    },
+    {
+      "id": 3,
+      "title": "Markdown 编辑器组件",
+      "description": "轻量级 Markdown 实时预览编辑器，支持 GFM 语法、代码高亮和自定义主题。",
+      "tech": ["React", "TypeScript", "Remark"],
+      "github": "https://github.com/MBri/md-editor",
+      "demo": "https://md-editor.mbri.dev",
+      "featured": false
+    },
+    {
+      "id": 4,
+      "title": "Vite 自动路由插件",
+      "description": "基于文件系统自动生成 React Router 路由配置的 Vite 插件，支持动态路由和嵌套路由。",
+      "tech": ["Vite", "Rollup", "Node.js"],
+      "github": "https://github.com/MBri/vite-auto-router",
+      "demo": null,
+      "featured": false
+    }
+  ]
+}

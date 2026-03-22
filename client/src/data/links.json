@@ -1,0 +1,32 @@
+{
+  "links": [
+    {
+      "id": 1,
+      "name": "晴风",
+      "url": "https://example.com/qingfeng",
+      "avatar": "https://api.dicebear.com/7.x/thumbs/svg?seed=qingfeng",
+      "description": "前端开发，喜欢摄影和旅行"
+    },
+    {
+      "id": 2,
+      "name": "星野",
+      "url": "https://example.com/xingye",
+      "avatar": "https://api.dicebear.com/7.x/thumbs/svg?seed=xingye",
+      "description": "全栈工程师，开源爱好者"
+    },
+    {
+      "id": 3,
+      "name": "林深",
+      "url": "https://example.com/linshen",
+      "avatar": "https://api.dicebear.com/7.x/thumbs/svg?seed=linshen",
+      "description": "硬件极客，Arduino 和 ESP32 玩家"
+    },
+    {
+      "id": 4,
+      "name": "云落",
+      "url": "https://example.com/yunluo",
+      "avatar": "https://api.dicebear.com/7.x/thumbs/svg?seed=yunluo",
+      "description": "设计 + 代码，追求极致的用户体验"
+    }
+  ]
+}

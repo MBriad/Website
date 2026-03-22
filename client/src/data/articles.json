@@ -1,0 +1,76 @@
+{
+  "articles": [
+    {
+      "id": 1,
+      "title": "React 19 新特性探索",
+      "slug": "react-19-features",
+      "excerpt": "React 19 带来了 Server Components、新的 use() hook 和编译器优化，让我们一起看看这些激动人心的变化。",
+      "date": "2026-03-15",
+      "tags": ["React", "前端"],
+      "category": "前端开发"
+    },
+    {
+      "id": 2,
+      "title": "基于 ESP32 的智能家居系统",
+      "slug": "esp32-smart-home",
+      "excerpt": "用 ESP32 搭建一套低成本的温湿度监控系统，通过 MQTT 协议实现设备间的实时通信。",
+      "date": "2026-03-10",
+      "tags": ["硬件", "IoT"],
+      "category": "硬件项目"
+    },
+    {
+      "id": 3,
+      "title": "Vite 插件开发指北",
+      "slug": "vite-plugin-guide",
+      "excerpt": "从零开始学习 Vite 插件开发，理解 Rollup 插件钩子和 Vite 独有 API，打造自己的构建工具链。",
+      "date": "2026-03-05",
+      "tags": ["工具", "前端"],
+      "category": "前端开发"
+    },
+    {
+      "id": 4,
+      "title": "TypeScript 5.x 类型体操",
+      "slug": "typescript-type-gymnastics",
+      "excerpt": "深入探讨 TypeScript 高级类型系统，包括条件类型、模板字面量类型和类型推断的实战技巧。",
+      "date": "2026-02-28",
+      "tags": ["TypeScript", "前端"],
+      "category": "前端开发"
+    },
+    {
+      "id": 5,
+      "title": "Arduino 传感器数据可视化",
+      "slug": "arduino-data-visualization",
+      "excerpt": "将 Arduino 采集的传感器数据通过 WebSocket 实时推送，用 Chart.js 绘制动态数据图表。",
+      "date": "2026-02-20",
+      "tags": ["硬件", "可视化"],
+      "category": "硬件项目"
+    },
+    {
+      "id": 6,
+      "title": "Zustand 状态管理最佳实践",
+      "slug": "zustand-best-practices",
+      "excerpt": "相比 Redux，Zustand 更加轻量灵活。本文总结了在实际项目中使用 Zustand 的模式和踩坑经验。",
+      "date": "2026-02-14",
+      "tags": ["React", "状态管理"],
+      "category": "前端开发"
+    },
+    {
+      "id": 7,
+      "title": "Docker 容器化部署指南",
+      "slug": "docker-deployment-guide",
+      "excerpt": "从 Dockerfile 编写到 Docker Compose 编排，手把手教你将 Node.js 应用容器化部署。",
+      "date": "2026-01-30",
+      "tags": ["DevOps", "工具"],
+      "category": "后端开发"
+    },
+    {
+      "id": 8,
+      "title": "CSS 玻璃拟态效果详解",
+      "slug": "glassmorphism-css",
+      "excerpt": "backdrop-filter 与半透明色彩的完美结合，打造梦幻的毛玻璃 UI 效果，附完整代码示例。",
+      "date": "2026-01-15",
+      "tags": ["CSS", "设计"],
+      "category": "前端开发"
+    }
+  ]
+}
