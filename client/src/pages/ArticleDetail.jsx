@@ -1,22 +1,70 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 import { ArrowIcon, TagIcon } from '../Icons';
-import articlesData from '../data/articles.json';
+import { articleAPI } from '../api/index.js';
 
 const ArticleDetail = () => {
   const { slug } = useParams();
-  const article = articlesData.articles.find(a => a.slug === slug);
+  const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!article) {
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await articleAPI.getBySlug(slug);
+        setArticle(data);
+      } catch (err) {
+        console.error('Failed to fetch article:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticle();
+  }, [slug]);
+
+  if (loading) {
     return (
       <div className="article-detail-container">
-        <div className="article-not-found">
-          <h1>文章未找到</h1>
-          <p>抱歉，您要查找的文章不存在。</p>
-          <Link to="/category" className="back-link">
-            <ArrowIcon /> 返回文章列表
-          </Link>
-        </div>
+        <motion.div
+          key="loading"
+          className="article-detail"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="article-placeholder">
+            <p>加载中...</p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (error || !article) {
+    return (
+      <div className="article-detail-container">
+        <motion.div
+          key="error"
+          className="article-detail"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="article-not-found">
+            <h1>文章未找到</h1>
+            <p>{error || '抱歉，您要查找的文章不存在。'}</p>
+            <Link to="/category" className="back-link">
+              <ArrowIcon /> 返回文章列表
+            </Link>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -24,6 +72,7 @@ const ArticleDetail = () => {
   return (
     <div className="article-detail-container">
       <motion.article
+        key="content"
         className="article-detail"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -34,7 +83,7 @@ const ArticleDetail = () => {
           <Link to="/category" className="back-link">
             <ArrowIcon /> 返回文章列表
           </Link>
-          
+
           <motion.h1
             className="article-title"
             initial={{ opacity: 0, y: 20 }}
@@ -45,7 +94,9 @@ const ArticleDetail = () => {
           </motion.h1>
 
           <div className="article-meta">
-            <span className="article-date">{article.date}</span>
+            <span className="article-date">
+              {new Date(article.createdAt).toLocaleDateString('zh-CN')}
+            </span>
             <span className="article-category">{article.category}</span>
             <div className="article-tags">
               {article.tags.map(tag => (
@@ -58,14 +109,16 @@ const ArticleDetail = () => {
         </header>
 
         {/* 文章摘要 */}
-        <motion.div
-          className="article-excerpt"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          {article.excerpt}
-        </motion.div>
+        {article.excerpt && (
+          <motion.div
+            className="article-excerpt"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            {article.excerpt}
+          </motion.div>
+        )}
 
         {/* 文章内容 */}
         <motion.div
@@ -74,29 +127,7 @@ const ArticleDetail = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
-          <div className="article-placeholder">
-            <p>📝 文章内容加载中...</p>
-            <p className="placeholder-hint">
-              这是一个示例文章详情页。实际内容将从后端 API 或 Markdown 文件加载。
-            </p>
-            <div className="placeholder-code">
-              <pre><code>{`// 示例代码
-function hello() {
-  console.log("Hello, World!");
-}
-
-hello();`}</code></pre>
-            </div>
-            <p>
-              在这个页面中，我们将实现以下功能：
-            </p>
-            <ul>
-              <li>Markdown 内容渲染</li>
-              <li>代码语法高亮</li>
-              <li>响应式布局</li>
-              <li>暗色模式支持</li>
-            </ul>
-          </div>
+          <ReactMarkdown>{article.content}</ReactMarkdown>
         </motion.div>
 
         {/* 文章底部 */}
