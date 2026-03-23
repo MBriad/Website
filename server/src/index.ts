@@ -37,6 +37,7 @@ async function registerPlugins() {
       origin: process.env.NODE_ENV === 'production'
         ? ['https://mbri.dev']
         : true,  // 开发环境允许所有来源
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true
     });
   }
