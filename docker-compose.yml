@@ -1,0 +1,42 @@
+services:
+  # MongoDB 数据库
+  mongodb:
+    image: mongo:7
+    container_name: mbri-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: mbri-website
+
+  # 后端 API 服务
+  backend:
+    build: ./server
+    container_name: mbri-backend
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    env_file:
+      - .env.production
+    volumes:
+      - ./server/uploads:/app/uploads
+      - ./server/logs:/app/logs
+
+  # 前端静态服务 (Nginx)
+  frontend:
+    build:
+      context: ./client
+      args:
+        VITE_API_URL: /api
+    container_name: mbri-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  mongodb-data:
