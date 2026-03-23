@@ -128,15 +128,15 @@
 
    ### 第六步 — 图片处理
 
-   - [ ] **安装 sharp**：在 `server/` 目录下 `npm install sharp`
-   - [ ] **创建图片上传路由**：`POST /api/upload`，接收图片后自动压缩转码为 `.webp`
-   - [ ] **前端上传组件**：在管理端编辑表单中添加图片上传
+   - [x] **安装 sharp**：在 `server/` 目录下 `npm install sharp`
+   - [x] **创建图片上传路由**：`POST /api/upload`，接收图片后自动压缩转码为 `.webp`
+   - [x] **前端上传组件**：在管理端编辑表单中添加图片上传
 
    ### 第六点五步 — 日志系统
 
-   - [ ] **配置 Fastify 文件日志**：使用 Pino 多流输出，同时写入终端和日志文件
-   - [ ] **日志目录**：创建 `server/logs/`，按日期分割日志文件
-   - [ ] **Gitignore**：添加 `server/logs/` 到 `.gitignore`
+   - [x] **配置 Fastify 文件日志**：使用 Pino 多流输出，同时写入终端和日志文件
+   - [x] **日志目录**：创建 `server/logs/`，按日期分割日志文件
+   - [x] **Gitignore**：添加 `server/logs/` 到 `.gitignore`
 
    ### 第七步 — Docker 部署上线
 
