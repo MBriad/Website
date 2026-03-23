@@ -19,12 +19,15 @@ const fastify = Fastify({
 
 // 注册插件
 async function registerPlugins() {
-  await fastify.register(cors, {
-    origin: process.env.NODE_ENV === 'production' 
-      ? ['https://mbri.dev'] 
-      : ['http://localhost:5173', 'http://localhost:5179'],
-    credentials: true
-  });
+  // CORS 由环境变量 ENABLE_CORS 控制，部署时 Nginx 反代已处理同源
+  if (process.env.ENABLE_CORS === 'true') {
+    await fastify.register(cors, {
+      origin: process.env.NODE_ENV === 'production'
+        ? ['https://mbri.dev']
+        : true,  // 开发环境允许所有来源
+      credentials: true
+    });
+  }
 
   await fastify.register(helmet);
 

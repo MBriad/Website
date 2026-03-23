@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowIcon, TagIcon } from '../Icons';
-import { searchAPI } from '../api.js';
+import { searchAPI } from '../api/index.js';
 
 const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
   const [query, setQuery] = useState('');

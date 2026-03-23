@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ArrowIcon, TagIcon } from '../Icons';
 import { articleAPI } from '../api/index.js';
 
@@ -127,7 +129,22 @@ const ArticleDetail = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
-          <ReactMarkdown>{article.content}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              code({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || '');
+                return !inline && match ? (
+                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" {...props}>
+                    {String(children).replace(/\n$/, '')}
+                  </SyntaxHighlighter>
+                ) : (
+                  <code className={className} {...props}>{children}</code>
+                );
+              }
+            }}
+          >
+            {article.content}
+          </ReactMarkdown>
         </motion.div>
 
         {/* 文章底部 */}

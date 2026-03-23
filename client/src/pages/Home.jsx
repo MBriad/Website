@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { GithubIcon, MailIcon, ArrowIcon, TagIcon } from '../Icons';
 import useTypewriter from '../hooks/useTypewriter';
-import { articleAPI, projectAPI, configAPI } from '../api.js';
+import { articleAPI, projectAPI, configAPI } from '../api/index.js';
 
 const QUOTES = [
   '忙点好啊，会发现忙里偷闲才是本事',
@@ -125,7 +125,7 @@ const Home = () => {
         />
 
         <div className="typewriter-quote">
-          {quote}
+          {quote.displayText}
           <span className="typewriter-cursor"></span>
         </div>
 

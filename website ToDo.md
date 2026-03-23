@@ -97,7 +97,7 @@
    - [x] **安装 react-markdown**：`npm install react-markdown`
    - [x] **改造 ArticleDetail.jsx**：从读本地 `articles.json` 改为调用 `articleAPI.getBySlug(slug)`
    - [x] **渲染 Markdown 内容**：用 `<ReactMarkdown>` 渲染 `article.content`，支持代码块等基础格式
-   - [ ] **（可选）代码高亮**：引入 `react-syntax-highlighter` 实现代码语法高亮
+   - [ ] **（可选）代码高亮**：引入 `react-syntax-highlighter` 实现代码语法高亮 ✅ 已完成
 
    ### 第二步 — JWT 登录接口
 
@@ -132,12 +132,16 @@
    - [ ] **创建图片上传路由**：`POST /api/upload`，接收图片后自动压缩转码为 `.webp`
    - [ ] **前端上传组件**：在管理端编辑表单中添加图片上传
 
-   ### 第七步 — 部署上线
+   ### 第七步 — Docker 部署上线
 
-   - [ ] **环境变量分离**：创建 `.env.development` 和 `.env.production`，区分 API 域名
-   - [ ] **前端部署**：配置 `vite.config.js`，推送至 Vercel 绑定域名
-   - [ ] **后端部署**：配置启动脚本，部署至 Railway 或 Render
-   - [ ] **数据库上云**：迁移至 MongoDB Atlas，配置网络白名单
+   - [ ] **创建 docker-compose.yml**：定义 frontend/backend/mongodb 三个服务
+   - [ ] **创建 client/Dockerfile**：构建 React 静态文件，用 Nginx 托管
+   - [ ] **创建 server/Dockerfile**：构建 TypeScript，运行 Node.js
+   - [ ] **环境变量分离**：创建 .env.production，配置 MONGODB_URI 等
+   - [ ] **Nginx 配置**：反向代理 /api 到 backend 服务，其余托管静态文件
+   - [ ] **HTTPS 配置**：使用 Let's Encrypt 或 Nginx + Certbot
+   - [ ] **服务器部署**：git clone + docker-compose up -d
+   - [ ] **(可选) 购买域名**：绑定到服务器 IP，配置 DNS
 
    ---
 
