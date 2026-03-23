@@ -4,6 +4,7 @@ import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import dotenv from 'dotenv';
 import { connectDatabase } from './config/database.js';
+import { createLoggerConfig } from './utils/logger.js';
 import { articleRoutes } from './routes/articles.js';
 import { projectRoutes } from './routes/projects.js';
 import { linkRoutes } from './routes/links.js';
@@ -13,8 +14,11 @@ import { authRoutes } from './routes/auth.js';
 // 加载环境变量
 dotenv.config();
 
+// 创建 logger 配置
+const loggerConfig = createLoggerConfig();
+
 const fastify = Fastify({
-  logger: true
+  logger: loggerConfig
 });
 
 // 注册插件

@@ -132,6 +132,12 @@
    - [ ] **创建图片上传路由**：`POST /api/upload`，接收图片后自动压缩转码为 `.webp`
    - [ ] **前端上传组件**：在管理端编辑表单中添加图片上传
 
+   ### 第六点五步 — 日志系统
+
+   - [ ] **配置 Fastify 文件日志**：使用 Pino 多流输出，同时写入终端和日志文件
+   - [ ] **日志目录**：创建 `server/logs/`，按日期分割日志文件
+   - [ ] **Gitignore**：添加 `server/logs/` 到 `.gitignore`
+
    ### 第七步 — Docker 部署上线
 
    - [ ] **创建 docker-compose.yml**：定义 frontend/backend/mongodb 三个服务
