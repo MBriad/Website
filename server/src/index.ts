@@ -2,7 +2,11 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
+import multipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
 import dotenv from 'dotenv';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { connectDatabase } from './config/database.js';
 import { createLoggerConfig } from './utils/logger.js';
 import { articleRoutes } from './routes/articles.js';
@@ -10,6 +14,10 @@ import { projectRoutes } from './routes/projects.js';
 import { linkRoutes } from './routes/links.js';
 import { configRoutes } from './routes/config.js';
 import { authRoutes } from './routes/auth.js';
+import { uploadRoutes } from './routes/upload.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // 加载环境变量
 dotenv.config();
@@ -55,6 +63,16 @@ async function registerPlugins() {
       'x-ratelimit-reset': true
     }
   });
+
+  // 文件上传支持
+  await fastify.register(multipart);
+
+  // 静态文件服务（uploads 目录）
+  await fastify.register(fastifyStatic, {
+    root: join(__dirname, '../uploads'),
+    prefix: '/uploads/',
+    decorateReply: false
+  });
 }
 
 // 注册路由
@@ -64,6 +82,7 @@ async function registerRoutes() {
   await fastify.register(projectRoutes);
   await fastify.register(linkRoutes);
   await fastify.register(configRoutes);
+  await fastify.register(uploadRoutes);
 }
 
 // 启动服务器

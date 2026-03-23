@@ -121,6 +121,20 @@ export const authAPI = {
 };
 
 /**
+ * 上传 API
+ */
+export const uploadAPI = {
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response;
+  }
+};
+
+/**
  * 搜索 API（本地过滤）
  */
 export const searchAPI = {

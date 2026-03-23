@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MDEditor from '@uiw/react-md-editor';
-import { articleAPI, projectAPI, linkAPI, configAPI } from '../api/index.js';
+import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI } from '../api/index.js';
 
 const TABS = [
   { key: 'articles', label: '文章' },
@@ -185,10 +185,11 @@ const Admin = () => {
 // ========== 文章 Tab ==========
 const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) => {
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ title: '', slug: '', content: '', excerpt: '', category: '', tags: '', published: true, featured: false });
+  const [form, setForm] = useState({ title: '', slug: '', content: '', excerpt: '', cover: '', category: '', tags: '', published: true, featured: false });
+  const [uploading, setUploading] = useState(false);
 
   const startNew = () => {
-    setForm({ title: '', slug: '', content: '', excerpt: '', category: '', tags: '', published: true, featured: false });
+    setForm({ title: '', slug: '', content: '', excerpt: '', cover: '', category: '', tags: '', published: true, featured: false });
     setEditing('new');
   };
 
@@ -198,12 +199,28 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
       slug: article.slug,
       content: article.content,
       excerpt: article.excerpt,
+      cover: article.cover || '',
       category: article.category,
       tags: article.tags.join(', '),
       published: article.published,
       featured: article.featured,
     });
     setEditing(article._id);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await uploadAPI.uploadImage(file);
+      setForm({ ...form, cover: res.url });
+      showMessage('封面图片上传成功');
+    } catch (err) {
+      setError(err.response?.data?.error || '图片上传失败');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -235,6 +252,24 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
         <input style={inputStyle} placeholder="分类" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required />
         <input style={inputStyle} placeholder="标签 (逗号分隔)" value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} />
         <input style={inputStyle} placeholder="摘要" value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} required />
+        {/* 封面图片上传 */}
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>封面图片</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            disabled={uploading}
+            style={{ fontSize: '0.85rem', marginBottom: '8px' }}
+          />
+          {uploading && <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>上传中...</div>}
+          {form.cover && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src={form.cover} alt="封面预览" style={{ maxWidth: '120px', maxHeight: '80px', borderRadius: '6px', objectFit: 'cover' }} />
+              <button type="button" onClick={() => setForm({ ...form, cover: '' })} style={{ fontSize: '0.8rem', cursor: 'pointer', color: '#ff6b6b', background: 'none', border: 'none' }}>移除</button>
+            </div>
+          )}
+        </div>
         <div data-color-mode="light" style={{ marginBottom: '12px' }}>
           <MDEditor
             value={form.content}
