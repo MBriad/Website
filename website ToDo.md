@@ -140,11 +140,11 @@
 
    ### 第七步 — Docker 部署上线
 
-   - [ ] **创建 docker-compose.yml**：定义 frontend/backend/mongodb 三个服务
-   - [ ] **创建 client/Dockerfile**：构建 React 静态文件，用 Nginx 托管
-   - [ ] **创建 server/Dockerfile**：构建 TypeScript，运行 Node.js
-   - [ ] **环境变量分离**：创建 .env.production，配置 MONGODB_URI 等
-   - [ ] **Nginx 配置**：反向代理 /api 到 backend 服务，其余托管静态文件
+   - [x] **创建 docker-compose.yml**：定义 frontend/backend/mongodb 三个服务
+   - [x] **创建 client/Dockerfile**：构建 React 静态文件，用 Nginx 托管
+   - [x] **创建 server/Dockerfile**：构建 TypeScript，运行 Node.js
+   - [x] **环境变量分离**：创建 .env.production，配置 MONGODB_URI 等
+   - [x] **Nginx 配置**：反向代理 /api 到 backend 服务，其余托管静态文件
    - [ ] **HTTPS 配置**：使用 Let's Encrypt 或 Nginx + Certbot
    - [ ] **服务器部署**：git clone + docker-compose up -d
    - [ ] **(可选) 购买域名**：绑定到服务器 IP，配置 DNS
