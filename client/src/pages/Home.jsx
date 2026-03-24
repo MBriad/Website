@@ -208,14 +208,18 @@ const Home = () => {
             {articles.map((article) => (
               <Link key={article._id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <FadeInCard whileHover={{ x: 5 }} className="article-card">
-                  {article.cover && (
-                    <img src={article.cover} alt={article.title} className="article-card-cover" />
-                  )}
+                  <div className="article-card-cover-wrapper">
+                    {article.cover ? (
+                      <img src={article.cover} alt={article.title} className="article-card-cover" />
+                    ) : (
+                      <div className="article-card-cover-placeholder" />
+                    )}
+                    <div className="article-card-overlay">
+                      <h3 className="article-card-title">{article.title}</h3>
+                      <p className="article-card-excerpt">{article.excerpt}</p>
+                    </div>
+                  </div>
                   <div className="article-card-body">
-                    <h3 style={{ fontWeight: 500, marginBottom: '6px', fontSize: '1.1rem' }}>
-                      {article.title}
-                    </h3>
-                    <p className="article-excerpt">{article.excerpt}</p>
                     <div className="article-meta">
                       <span>{new Date(article.createdAt).toLocaleDateString('zh-CN')}</span>
                       <div style={{ display: 'flex', gap: '8px' }}>
