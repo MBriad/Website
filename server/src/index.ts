@@ -26,7 +26,8 @@ dotenv.config();
 const loggerConfig = createLoggerConfig();
 
 const fastify = Fastify({
-  logger: loggerConfig
+  logger: loggerConfig,
+  bodyLimit: 10 * 1024 * 1024  // 全局 10MB 限制
 });
 
 // 注册插件

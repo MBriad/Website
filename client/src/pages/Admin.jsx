@@ -54,7 +54,7 @@ const Admin = () => {
         navigate('/login');
         return;
       }
-      setError('加载数据失败');
+      showError('加载数据失败');
     } finally {
       setLoading(false);
     }
@@ -63,6 +63,11 @@ const Admin = () => {
   const showMessage = (msg) => {
     setMessage(msg);
     setTimeout(() => setMessage(''), 3000);
+  };
+
+  const showError = (msg) => {
+    setError(msg);
+    setTimeout(() => setError(''), 5000);
   };
 
   const handleDelete = async (type, id) => {
@@ -74,7 +79,7 @@ const Admin = () => {
       showMessage('删除成功');
       fetchData();
     } catch (err) {
-      setError(err.response?.data?.error || '删除失败');
+      showError(err.response?.data?.error || '删除失败');
     }
   };
 
@@ -217,7 +222,7 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
       setForm({ ...form, cover: res.url });
       showMessage('封面图片上传成功');
     } catch (err) {
-      setError(err.response?.data?.error || '图片上传失败');
+      showError(err.response?.data?.error || '图片上传失败');
     } finally {
       setUploading(false);
     }
@@ -237,7 +242,7 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
       setEditing(null);
       onRefresh();
     } catch (err) {
-      setError(err.response?.data?.error || '操作失败');
+      showError(err.response?.data?.error || '操作失败');
     }
   };
 
@@ -350,7 +355,7 @@ const ProjectTab = ({ projects, onDelete, onRefresh, showMessage, setError }) =>
       setEditing(null);
       onRefresh();
     } catch (err) {
-      setError(err.response?.data?.error || '操作失败');
+      showError(err.response?.data?.error || '操作失败');
     }
   };
 
@@ -424,7 +429,7 @@ const LinkTab = ({ links, onDelete, onRefresh, showMessage, setError }) => {
       setEditing(null);
       onRefresh();
     } catch (err) {
-      setError(err.response?.data?.error || '操作失败');
+      showError(err.response?.data?.error || '操作失败');
     }
   };
 
@@ -489,7 +494,7 @@ const ConfigTab = ({ config, onRefresh, showMessage, setError }) => {
       showMessage('配置更新成功');
       onRefresh();
     } catch (err) {
-      setError(err.response?.data?.error || '更新失败');
+      showError(err.response?.data?.error || '更新失败');
     }
   };
 
