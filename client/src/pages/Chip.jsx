@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GithubIcon, ArrowIcon } from '../Icons';
 import { projectAPI } from '../api/index.js';
+import Loading from '../components/Loading.jsx';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -46,19 +47,7 @@ const Chip = () => {
 
   // 加载状态
   if (loading) {
-    return (
-      <motion.main
-        className="chip-container"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="chip-grid">
-          <div className="chip-card">加载中...</div>
-        </div>
-      </motion.main>
-    );
+    return <Loading />;
   }
 
   // 错误状态

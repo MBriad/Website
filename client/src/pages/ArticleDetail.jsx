@@ -6,6 +6,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ArrowIcon, TagIcon } from '../Icons';
 import { articleAPI } from '../api/index.js';
+import Loading from '../components/Loading.jsx';
 
 const ArticleDetail = () => {
   const { slug } = useParams();
@@ -32,21 +33,7 @@ const ArticleDetail = () => {
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="article-detail-container">
-        <motion.div
-          key="loading"
-          className="article-detail"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="article-placeholder">
-            <p>加载中...</p>
-          </div>
-        </motion.div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error || !article) {

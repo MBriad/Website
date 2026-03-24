@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GithubIcon, MailIcon } from '../Icons';
 import { configAPI } from '../api/index.js';
+import Loading from '../components/Loading.jsx';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -46,17 +47,7 @@ const About = () => {
 
   // 加载状态
   if (loading) {
-    return (
-      <motion.main
-        className="about-container"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="about-content">加载中...</div>
-      </motion.main>
-    );
+    return <Loading />;
   }
 
   // 错误状态

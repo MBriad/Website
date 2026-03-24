@@ -1,0 +1,53 @@
+/* src/styles/components/loading.css */
+
+/* 全屏加载容器 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+}
+
+/* 旋转加载器 */
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(160, 216, 239, 0.2);
+  border-top-color: var(--accent-blue, #a0d8ef);
+  border-radius: 50%;
+}
+
+/* 加载文字 */
+.loading-text {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #888);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+/* 内联加载（三个跳动小圆点） */
+.loading-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.loading-dot {
+  width: 6px;
+  height: 6px;
+  background-color: currentColor;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+/* 暗色模式 */
+[data-theme='dark'] .loading-spinner {
+  border-color: rgba(160, 216, 239, 0.15);
+  border-top-color: var(--accent-blue, #a0d8ef);
+}
+
+[data-theme='dark'] .loading-text {
+  color: var(--text-secondary, #aaa);
+}

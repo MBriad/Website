@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { TagIcon } from '../Icons';
 import { articleAPI } from '../api/index.js';
+import Loading from '../components/Loading.jsx';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -69,17 +70,7 @@ const Category = () => {
 
   // 加载状态
   if (loading) {
-    return (
-      <motion.main
-        className="category-container"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="timeline-empty">加载中...</div>
-      </motion.main>
-    );
+    return <Loading />;
   }
 
   // 错误状态

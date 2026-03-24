@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { GithubIcon, MailIcon, ArrowIcon, TagIcon } from '../Icons';
 import useTypewriter from '../hooks/useTypewriter';
 import { articleAPI, projectAPI, configAPI } from '../api/index.js';
+import Loading from '../components/Loading.jsx';
 
 const QUOTES = [
   '忙点好啊，会发现忙里偷闲才是本事',
@@ -89,13 +90,7 @@ const Home = () => {
 
   // 加载状态
   if (loading) {
-    return (
-      <main className="home-container">
-        <section className="hero-section">
-          <div className="typewriter-quote">加载中...</div>
-        </section>
-      </main>
-    );
+    return <Loading />;
   }
 
   // 错误状态

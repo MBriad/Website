@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { authAPI } from '../api/index.js';
+import Loading from '../components/Loading.jsx';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -117,7 +118,7 @@ const Login = () => {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? '登录中...' : '登录'}
+            {loading ? <><Loading mode="inline" /> 登录中...</> : '登录'}
           </button>
         </form>
       </motion.div>

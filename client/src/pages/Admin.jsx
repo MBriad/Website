@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MDEditor from '@uiw/react-md-editor';
 import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI } from '../api/index.js';
+import Loading from '../components/Loading.jsx';
 
 const TABS = [
   { key: 'articles', label: '文章' },
@@ -89,11 +90,7 @@ const Admin = () => {
   };
 
   if (loading) {
-    return (
-      <div className="article-detail-container">
-        <div className="article-detail">加载中...</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
