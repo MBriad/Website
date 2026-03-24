@@ -439,3 +439,22 @@
     gap: 24px;
   }
 }
+
+/* 文章卡片封面 */
+.article-card {
+  display: flex;
+  gap: 16px;
+}
+
+.article-card-cover {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.article-card-body {
+  flex: 1;
+  min-width: 0;
+}

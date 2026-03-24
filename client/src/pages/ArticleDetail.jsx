@@ -110,6 +110,18 @@ const ArticleDetail = () => {
           </div>
         </header>
 
+        {/* 文章封面 */}
+        {article.cover && (
+          <motion.div
+            className="article-cover"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.6 }}
+          >
+            <img src={article.cover} alt={article.title} />
+          </motion.div>
+        )}
+
         {/* 文章摘要 */}
         {article.excerpt && (
           <motion.div

@@ -78,6 +78,18 @@
   flex-wrap: wrap;
 }
 
+/* 文章封面 */
+.article-cover {
+  margin-bottom: 30px;
+}
+
+.article-cover img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
 .article-tag {
   display: inline-flex;
   align-items: center;
