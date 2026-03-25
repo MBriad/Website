@@ -2,7 +2,7 @@
  * @file src/components/NavBar.jsx
  * @brief 实现滚动物理收缩动画的导航栏
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import useStore from '../store/useStore';
@@ -11,6 +11,8 @@ import { HomeIcon, CategoryIcon, LinksIcon, ChipIcon, AboutIcon, SearchIcon, Sun
 export default function NavBar({ setIsSearchOpen }) {
   const theme = useStore((s) => s.theme);
   const toggleTheme = useStore((s) => s.toggleTheme);
+  const user = useStore((s) => s.user);
+  const clearUser = useStore((s) => s.clearUser);
   const { scrollY } = useScroll();
   const location = useLocation();
   
@@ -18,6 +20,9 @@ export default function NavBar({ setIsSearchOpen }) {
   const [isScrolled, setIsScrolled] = useState(false);
   // 2. 移动端菜单状态
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // 首次加载标记：只在初始加载时播放入场动画，页面切换时不动
+  const hasMounted = useRef(false);
+  useEffect(() => { hasMounted.current = true; }, []);
 
   // 3. 监听滚动位置，一旦超过 50px，就触发收缩状态
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -44,8 +49,8 @@ export default function NavBar({ setIsSearchOpen }) {
     <>
       <motion.header 
         className="glass-nav-container"
-        initial={{ y: -100 }}
-        animate={{ y: 0, top: isScrolled ? 10 : 20 }} // 滚动时稍微贴顶
+        initial={hasMounted.current ? false : { y: -100 }}
+        animate={{ y: 0, top: isScrolled ? 10 : 20 }}
         transition={{ duration: 0.5 }}
       >
         {/* ================= 左侧 Logo 胶囊 ================= */}
@@ -169,38 +174,58 @@ export default function NavBar({ setIsSearchOpen }) {
           ></motion.div>
 
           {/* 搜索按钮 */}
-          <motion.span layout onClick={() => setIsSearchOpen(true)} style={{ cursor: 'pointer', display: 'flex' }}>
+          <motion.button layout onClick={() => setIsSearchOpen(true)} aria-label="搜索" style={{ cursor: 'pointer', display: 'flex', background: 'none', border: 'none', padding: 0 }}>
             <SearchIcon />
-          </motion.span>
+          </motion.button>
         </motion.div>
 
         {/* ================= 汉堡菜单按钮 ================= */}
-        <div 
+        <button
           className={`hamburger-menu ${isMenuOpen ? 'active' : ''}`}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="菜单"
+          aria-expanded={isMenuOpen}
+          style={{ background: 'none', border: 'none', padding: 0 }}
         >
           <span></span>
           <span></span>
           <span></span>
-        </div>
+        </button>
 
         {/* ================= 右侧 主题切换按钮 ================= */}
-        <motion.div 
-          layout 
+        <motion.button
+          layout
           className="circle-btn"
           onClick={toggleTheme}
           whileHover={{ scale: 1.05 }}
-          style={{ cursor: 'pointer' }}
+          aria-label={theme === 'light' ? '切换暗色模式' : '切换亮色模式'}
+          style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
         >
           {theme === 'light' ? <MoonIcon /> : <SunIcon />}
-        </motion.div>
+        </motion.button>
+
+        {/* ================= 用户区域 ================= */}
+        {user ? (
+          <div className="nav-user-info" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{user.username}</span>
+            <button onClick={clearUser} aria-label="退出登录" className="nav-user-logout" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-secondary)', padding: '4px 8px', borderRadius: '8px' }}>
+              退出
+            </button>
+          </div>
+        ) : (
+          <div className="nav-user-links" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
+            <Link to="/user-login" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textDecoration: 'none' }}>登录</Link>
+            <Link to="/register" style={{ fontSize: '0.85rem', color: 'var(--accent-blue, #a0d8ef)', textDecoration: 'none' }}>注册</Link>
+          </div>
+        )}
       </motion.header>
 
       {/* ================= 移动端导航菜单 ================= */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
+          <motion.nav
             className="mobile-menu open"
+            aria-label="移动端导航"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -226,11 +251,25 @@ export default function NavBar({ setIsSearchOpen }) {
               <AboutIcon />
               <b>关于我</b>
             </NavLink>
-            <div className="theme-toggle" onClick={toggleTheme}>
+            <button className="theme-toggle" onClick={toggleTheme} aria-label={theme === 'light' ? '切换暗色模式' : '切换亮色模式'} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
               {theme === 'light' ? <MoonIcon /> : <SunIcon />}
               <b>{theme === 'light' ? '切换暗色模式' : '切换亮色模式'}</b>
-            </div>
-          </motion.div>
+            </button>
+            {user ? (
+              <button onClick={clearUser} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}>
+                <b>退出登录 ({user.username})</b>
+              </button>
+            ) : (
+              <>
+                <NavLink to="/user-login" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+                  <b>登录</b>
+                </NavLink>
+                <NavLink to="/register" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+                  <b>注册</b>
+                </NavLink>
+              </>
+            )}
+          </motion.nav>
         )}
       </AnimatePresence>
     </>

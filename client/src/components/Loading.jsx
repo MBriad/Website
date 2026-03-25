@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 const Loading = ({ mode = 'page', text = '加载中...' }) => {
   if (mode === 'inline') {
     return (
-      <span className="loading-inline">
+      <span className="loading-inline" role="status" aria-label="加载中">
         <motion.span
           className="loading-dot"
           animate={{ scale: [1, 1.3, 1] }}
@@ -32,6 +32,8 @@ const Loading = ({ mode = 'page', text = '加载中...' }) => {
   return (
     <motion.div
       className="loading-container"
+      role="status"
+      aria-label="加载中"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

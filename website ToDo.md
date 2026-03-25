@@ -97,7 +97,7 @@
    - [x] **安装 react-markdown**：`npm install react-markdown`
    - [x] **改造 ArticleDetail.jsx**：从读本地 `articles.json` 改为调用 `articleAPI.getBySlug(slug)`
    - [x] **渲染 Markdown 内容**：用 `<ReactMarkdown>` 渲染 `article.content`，支持代码块等基础格式
-   - [ ] **（可选）代码高亮**：引入 `react-syntax-highlighter` 实现代码语法高亮 ✅ 已完成
+    - [x] **（可选）代码高亮**：引入 `react-syntax-highlighter` 实现代码语法高亮
 
    ### 第二步 — JWT 登录接口
 
@@ -149,6 +149,22 @@
    - [ ] **服务器部署**：git clone + docker-compose up -d
    - [ ] **(可选) 购买域名**：绑定到服务器 IP，配置 DNS
 
+   ### 第八步 — 用户注册 + 登录 + 评论系统
+
+   - [x] **User 模型**：`server/src/models/User.ts`（username, email, password, avatar, role）
+   - [x] **Comment 模型**：`server/src/models/Comment.ts`（articleId, userId, content）
+   - [x] **用户路由**：`POST /api/register`、`POST /api/user-login`、`GET /api/profile`
+   - [x] **评论路由**：`GET /api/comments/:articleId`、`POST /api/comments`、`DELETE /api/comments/:id`
+   - [x] **authMiddleware 更新**：JWT payload 支持 userId + role，新增 optionalAuthMiddleware
+   - [x] **前端注册页**：`client/src/pages/Register.jsx`
+   - [x] **前端用户登录页**：`client/src/pages/UserLogin.jsx`
+   - [x] **评论区组件**：`client/src/components/CommentSection.jsx`
+   - [x] **NavBar 用户状态**：已登录显示用户名+退出，未登录显示登录/注册
+   - [x] **ArticleDetail 集成**：文章底部嵌入评论区
+   - [x] **CSS 样式**：`client/src/styles/components/comments.css`
+   - [x] **Server 测试**：`users.test.ts`（9 cases）、`comments.test.ts`（9 cases）
+   - [x] **Client 测试**：`CommentSection.test.jsx`（4 cases）
+
    ---
 
    ## 附录：数据库设计 Schema 参考 (MongoDB)
@@ -166,5 +182,30 @@
      category: String,       // 分类
      published: Boolean,
      createdAt: Date,
-     updatedAt: Date
+      updatedAt: Date
+    }
+   ```
+
+   **User (用户)**
+   ```javascript
+   {
+     _id: ObjectId,
+     username: String,       // unique, 2-20 字符
+     email: String,          // unique
+     password: String,       // bcrypt hashed
+     avatar: String?,        // 可选头像 URL
+     role: String,           // 'user' | 'admin'
+     createdAt: Date
    }
+   ```
+
+   **Comment (评论)**
+   ```javascript
+   {
+     _id: ObjectId,
+     articleId: ObjectId,    // ref Article
+     userId: ObjectId,       // ref User
+     content: String,        // max 1000 字符
+     createdAt: Date
+   }
+   ```

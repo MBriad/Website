@@ -14,14 +14,13 @@ if (!existsSync(logsDir)) {
 /**
  * 创建 Fastify logger 配置
  * - 开发环境：终端彩色输出 + 文件日志
- * - 生产环境：仅文件日志
+ * - 生产环境：JSON 输出到 stdout（Docker 友好）
  */
 export function createLoggerConfig() {
   const isDev = process.env.NODE_ENV !== 'production';
-  const logFile = join(logsDir, `app-${new Date().toISOString().split('T')[0]}.log`);
 
   if (isDev) {
-    // 开发环境：终端彩色 + 文件 JSON
+    const logFile = join(logsDir, `app-${new Date().toISOString().split('T')[0]}.log`);
     return {
       transport: {
         targets: [
@@ -40,11 +39,8 @@ export function createLoggerConfig() {
     };
   }
 
-  // 生产环境：仅文件 JSON
+  // 生产环境：JSON 到 stdout，由 Docker 捕获日志
   return {
-    transport: {
-      target: 'pino/file',
-      options: { destination: logFile, mkdir: true }
-    }
+    level: 'info'
   };
 }

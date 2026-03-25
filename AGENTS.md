@@ -19,6 +19,9 @@ All commands run from their respective directory (`client/` or `server/`).
 npm run dev      # Start Vite dev server
 npm run build    # Production build (vite build)
 npm run preview  # Preview production build
+npm run lint     # Run ESLint (eslint.config.js)
+npm run test     # Run Vitest tests once
+npm run test:watch # Run Vitest in watch mode
 ```
 
 ### Server (`server/`)
@@ -34,22 +37,25 @@ npm run test:watch # Run Vitest in watch mode
 
 ### Linting
 
-- Client has ESLint configured (`eslint.config.js`) — run manually with `npx eslint .`
-- Server has no linter; rely on `tsc` strict mode for type checking (`npm run build`)
-- No project-wide lint or format scripts exist
+- Client: `npm run lint` (runs `npx eslint .` via `eslint.config.js`)
+- Server: no linter; rely on `tsc` strict mode for type checking (`npm run build`)
+- No project-wide format scripts exist
 
 ### Testing
 
-- **Test runner**: Vitest (`server/vitest.config.ts`)
-- **Test files**: `*.test.ts` in `src/` (e.g., `src/routes/auth.test.ts`)
-- **Config**: `globals: true`, `environment: 'node'`
-- **Run single test**: `npm run test -- --run src/routes/auth.test.ts`
+- **Test runner**: Vitest (both client and server)
+- **Client tests**: `*.test.{js,jsx}` in `src/` — uses `@testing-library/react`, `jsdom` environment
+- **Client config**: `client/vitest.config.js` — `globals: true`, `environment: 'jsdom'`
+- **Server tests**: `*.test.ts` in `src/` — `mongodb-memory-server` for isolated DB tests
+- **Server config**: `server/vitest.config.ts` — `globals: true`, `environment: 'node'`
+- **Run single test**: `npm run test -- src/components/Loading.test.jsx` (client) or `npm run test -- src/routes/articles.test.ts` (server)
 - **Structure**: `describe`/`it` blocks, `beforeAll`/`afterAll` for setup/teardown
 
 ```bash
-npm run test           # Run all tests once
+npm run test           # Run all tests once (both sides)
 npm run test:watch     # Run tests in watch mode
-npm run test -- --run src/routes/auth.test.ts  # Run single file
+npm run test -- src/components/Loading.test.jsx  # Run single client test
+npm run test -- src/routes/articles.test.ts      # Run single server test
 ```
 
 ## Code Style
@@ -118,7 +124,7 @@ import { connectDatabase } from './config/database.js';
 | TS models | PascalCase | `Article`, `Project` |
 | API endpoints | `/api/resource` | `/api/articles/:slug` |
 | CSS files | camelCase or kebab-case | `global.css`, `article-detail.css` |
-| Test files | `*.test.ts` | `auth.test.ts`, `crud.test.ts` |
+| Test files | `*.test.{js,jsx}` (client), `*.test.ts` (server) | `Loading.test.jsx`, `auth.test.ts` |
 
 ### Error Handling
 

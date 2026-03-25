@@ -143,6 +143,9 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
       {isSearchOpen && (
         <motion.div
           className="search-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="搜索"
           initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
           animate={{ opacity: 1, backdropFilter: "blur(15px)" }}
           exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
@@ -161,6 +164,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
               type="text"
               className="search-input"
               placeholder="搜索物语..."
+              aria-label="搜索"
               value={query}
               onChange={handleInputChange}
             />
@@ -171,7 +175,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                 <div className="search-suggestions-title">热门搜索</div>
                 <div className="search-suggestions-list">
                   {suggestions.map((tag, i) => (
-                    <motion.span
+                    <motion.button
                       key={tag}
                       className="search-suggestion-tag"
                       onClick={() => {
@@ -182,9 +186,10 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                     >
                       <TagIcon /> {tag}
-                    </motion.span>
+                    </motion.button>
                   ))}
                 </div>
               </div>
@@ -215,11 +220,13 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                     {results.articles.map((a, idx) => {
                       const globalIdx = idx;
                       return (
-                        <div
+                        <button
                           key={a._id}
                           className={`search-result-item ${selectedIndex === globalIdx ? 'selected' : ''}`}
                           onClick={() => goTo(`/article/${a.slug}`)}
                           onMouseEnter={() => setSelectedIndex(globalIdx)}
+                          aria-label={a.title}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', width: '100%' }}
                         >
                           <div className="search-result-name">
                             {highlightText(a.title, query)}
@@ -234,7 +241,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                               </span>
                             ))}
                           </div>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
@@ -248,11 +255,13 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                     {results.projects.map((p, idx) => {
                       const globalIdx = results.articles.length + idx;
                       return (
-                        <div
+                        <button
                           key={p._id}
                           className={`search-result-item ${selectedIndex === globalIdx ? 'selected' : ''}`}
                           onClick={() => goTo('/chip')}
                           onMouseEnter={() => setSelectedIndex(globalIdx)}
+                          aria-label={p.title}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', width: '100%' }}
                         >
                           <div className="search-result-name">
                             {highlightText(p.title, query)}
@@ -265,7 +274,7 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
                               <span key={t} className="tech-badge">{t}</span>
                             ))}
                           </div>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
@@ -280,15 +289,17 @@ const SearchModal = ({ isSearchOpen, setIsSearchOpen }) => {
               <span><kbd>Esc</kbd> 关闭</span>
             </div>
 
-            <motion.span
+            <motion.button
               className="close-search"
               onClick={handleClose}
+              aria-label="关闭搜索"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.4 }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
             >
               [ 关闭 ]
-            </motion.span>
+            </motion.button>
           </motion.div>
         </motion.div>
       )}

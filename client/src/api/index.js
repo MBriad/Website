@@ -114,10 +114,49 @@ export const configAPI = {
 };
 
 /**
- * 登录 API
+ * 登录 API（管理员）
  */
 export const authAPI = {
   login: (username, password) => api.post('/login', { username, password }),
+};
+
+/**
+ * 用户 API（普通注册用户）
+ */
+export const userAPI = {
+  register: (username, email, password) => api.post('/register', { username, email, password }),
+  login: (username, password) => api.post('/user-login', { username, password }),
+  getProfile: () => api.get('/profile'),
+};
+
+/**
+ * 评论 API
+ */
+export const commentAPI = {
+  getList: (articleId) => api.get(`/comments/${articleId}`),
+  create: (articleId, content) => api.post('/comments', { articleId, content }),
+  remove: (id) => api.delete(`/comments/${id}`),
+};
+
+/**
+ * 音乐 API
+ */
+export const musicAPI = {
+  getList: () => api.get('/music'),
+  create: (data) => api.post('/music', data),
+  update: (id, data) => api.put(`/music/${id}`, data),
+  remove: (id) => api.delete(`/music/${id}`),
+};
+
+/**
+ * 壁纸 API
+ */
+export const wallpaperAPI = {
+  getList: () => api.get('/wallpapers'),
+  getAll: () => api.get('/wallpapers/all'),
+  create: (data) => api.post('/wallpapers', data),
+  update: (id, data) => api.put(`/wallpapers/${id}`, data),
+  remove: (id) => api.delete(`/wallpapers/${id}`),
 };
 
 /**

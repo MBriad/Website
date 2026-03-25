@@ -35,3 +35,5 @@ mongodb-data/
 nul
 query
 *.bak
+test-payload.json
+tui.json

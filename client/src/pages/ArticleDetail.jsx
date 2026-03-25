@@ -7,6 +7,7 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ArrowIcon, TagIcon } from '../Icons';
 import { articleAPI } from '../api/index.js';
 import Loading from '../components/Loading.jsx';
+import CommentSection from '../components/CommentSection.jsx';
 
 const ArticleDetail = () => {
   const { slug } = useParams();
@@ -159,6 +160,9 @@ const ArticleDetail = () => {
             </Link>
           </div>
         </motion.footer>
+
+        {/* 评论区 */}
+        <CommentSection articleId={article._id} />
       </motion.article>
     </div>
   );

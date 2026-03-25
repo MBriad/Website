@@ -14,6 +14,7 @@ import './styles/components/footer.css'
 import './styles/components/common.css'
 import './styles/components/article-detail.css'
 import './styles/components/loading.css'
+import './styles/components/comments.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

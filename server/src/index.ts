@@ -15,6 +15,10 @@ import { linkRoutes } from './routes/links.js';
 import { configRoutes } from './routes/config.js';
 import { authRoutes } from './routes/auth.js';
 import { uploadRoutes } from './routes/upload.js';
+import { userRoutes } from './routes/users.js';
+import { commentRoutes } from './routes/comments.js';
+import { musicRoutes } from './routes/music.js';
+import { wallpaperRoutes } from './routes/wallpapers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -27,7 +31,7 @@ const loggerConfig = createLoggerConfig();
 
 const fastify = Fastify({
   logger: loggerConfig,
-  bodyLimit: 10 * 1024 * 1024  // 全局 10MB 限制
+  bodyLimit: 200 * 1024 * 1024  // 全局 200MB 限制（支持 FLAC 上传）
 });
 
 // 注册插件
@@ -66,8 +70,10 @@ async function registerPlugins() {
     }
   });
 
-  // 文件上传支持
-  await fastify.register(multipart);
+  // 文件上传支持（200MB 限制，支持 FLAC）
+  await fastify.register(multipart, {
+    limits: { fileSize: 200 * 1024 * 1024 }
+  });
 
   // 静态文件服务（uploads 目录）
   await fastify.register(fastifyStatic, {
@@ -80,11 +86,15 @@ async function registerPlugins() {
 // 注册路由
 async function registerRoutes() {
   await fastify.register(authRoutes);
+  await fastify.register(userRoutes);
   await fastify.register(articleRoutes);
   await fastify.register(projectRoutes);
   await fastify.register(linkRoutes);
   await fastify.register(configRoutes);
   await fastify.register(uploadRoutes);
+  await fastify.register(commentRoutes);
+  await fastify.register(musicRoutes);
+  await fastify.register(wallpaperRoutes);
 }
 
 // 启动服务器

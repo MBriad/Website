@@ -85,15 +85,13 @@ h6 {
   height: 100vh;
   z-index: -2;
 
-  background-image: url('/teto.jpg');
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   background-color: var(--bg-paper);
 
-  filter: blur(4px);
-  will-change: transform, filter;
-  transition: opacity 0.6s ease;
+  transition: opacity 0.8s ease;
 }
 
 /* =========================================
@@ -120,15 +118,36 @@ h6 {
   background-color: var(--bg-paper);
 }
 
+/* 壁纸轮播指示器 */
+.wallpaper-dots {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.wallpaper-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.wallpaper-dot.active {
+  background: rgba(255, 255, 255, 0.9);
+  width: 20px;
+  border-radius: 4px;
+}
+
 /* =========================================
    2b. 暗色主题
    ========================================= */
 [data-theme='dark'] .bg-overlay-layer {
   background-color: rgba(0, 0, 0, 0.35);
-}
-
-[data-theme='dark'] .bg-image-layer {
-  background-image: url('/preview.jpg');
 }
 
 [data-theme='dark'] .bg-overlay-layer.bg-hidden {

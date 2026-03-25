@@ -6,20 +6,22 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MDEditor from '@uiw/react-md-editor';
-import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI } from '../api/index.js';
+import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI } from '../api/index.js';
 import Loading from '../components/Loading.jsx';
 
 const TABS = [
   { key: 'articles', label: '文章' },
   { key: 'projects', label: '项目' },
   { key: 'links', label: '友链' },
+  { key: 'music', label: '音乐' },
+  { key: 'wallpapers', label: '壁纸' },
   { key: 'config', label: '配置' },
 ];
 
 const Admin = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('articles');
-  const [data, setData] = useState({ articles: [], projects: [], links: [], config: null });
+  const [data, setData] = useState({ articles: [], projects: [], links: [], music: [], wallpapers: [], config: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -37,16 +39,20 @@ const Admin = () => {
     setLoading(true);
     setError('');
     try {
-      const [articles, projects, links, config] = await Promise.all([
+      const [articles, projects, links, music, wallpapers, config] = await Promise.all([
         articleAPI.getList(),
         projectAPI.getList(),
         linkAPI.getList(),
+        musicAPI.getList().catch(() => []),
+        wallpaperAPI.getAll().catch(() => []),
         configAPI.get().catch(() => null),
       ]);
       setData({
         articles: articles.data || [],
         projects: projects || [],
         links: links || [],
+        music: music || [],
+        wallpapers: wallpapers || [],
         config,
       });
     } catch (err) {
@@ -77,6 +83,8 @@ const Admin = () => {
       if (type === 'articles') await articleAPI.remove(id);
       else if (type === 'projects') await projectAPI.remove(id);
       else if (type === 'links') await linkAPI.remove(id);
+      else if (type === 'music') await musicAPI.remove(id);
+      else if (type === 'wallpapers') await wallpaperAPI.remove(id);
       showMessage('删除成功');
       fetchData();
     } catch (err) {
@@ -164,6 +172,28 @@ const Admin = () => {
           <LinkTab
             links={data.links}
             onDelete={(id) => handleDelete('links', id)}
+            onRefresh={fetchData}
+            showMessage={showMessage}
+            setError={setError}
+          />
+        )}
+
+        {/* 音乐管理 */}
+        {activeTab === 'music' && (
+          <MusicTab
+            music={data.music}
+            onDelete={(id) => handleDelete('music', id)}
+            onRefresh={fetchData}
+            showMessage={showMessage}
+            setError={setError}
+          />
+        )}
+
+        {/* 壁纸管理 */}
+        {activeTab === 'wallpapers' && (
+          <WallpaperTab
+            wallpapers={data.wallpapers}
+            onDelete={(id) => handleDelete('wallpapers', id)}
             onRefresh={fetchData}
             showMessage={showMessage}
             setError={setError}
@@ -507,6 +537,217 @@ const ConfigTab = ({ config, onRefresh, showMessage, setError }) => {
       <input style={inputStyle} placeholder="Twitter 链接" value={form.twitter} onChange={e => setForm({ ...form, twitter: e.target.value })} />
       <button type="submit" className="nav-button" style={{ border: 'none', cursor: 'pointer' }}>保存配置</button>
     </form>
+  );
+};
+
+// ========== 音乐管理 Tab ==========
+const MusicTab = ({ music, onDelete, onRefresh, showMessage, setError }) => {
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ title: '', artist: '', src: '', cover: '', order: 0 });
+
+  const startAdd = () => {
+    setEditing('new');
+    setForm({ title: '', artist: '', src: '', cover: '', order: music.length });
+  };
+
+  const startEdit = (m) => {
+    setEditing(m._id);
+    setForm({ title: m.title, artist: m.artist, src: m.src, cover: m.cover || '', order: m.order || 0 });
+  };
+
+  const handleFileUpload = async (file, field) => {
+    try {
+      const res = await uploadAPI.uploadImage(file);
+      setForm({ ...form, [field]: res.url });
+      showMessage(`${field === 'cover' ? '封面' : '音频'}上传成功`);
+    } catch (err) {
+      setError(err.response?.data?.error || '上传失败');
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editing === 'new') {
+        await musicAPI.create(form);
+        showMessage('添加成功');
+      } else {
+        await musicAPI.update(editing, form);
+        showMessage('更新成功');
+      }
+      setEditing(null);
+      onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || '操作失败');
+    }
+  };
+
+  const inputStyle = { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', color: 'var(--text-ink)', outline: 'none', boxSizing: 'border-box', marginBottom: '12px' };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h3 style={{ margin: 0, fontSize: '1rem' }}>音乐列表 ({music.length})</h3>
+        <button onClick={startAdd} className="nav-button" style={{ padding: '6px 14px', border: 'none', cursor: 'pointer' }}>
+          + 添加音乐
+        </button>
+      </div>
+
+      {editing && (
+        <form onSubmit={handleSubmit} style={{ marginBottom: '24px', padding: '16px', background: 'rgba(160,216,239,0.05)', borderRadius: '12px' }}>
+          <input style={inputStyle} placeholder="歌曲标题" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+          <input style={inputStyle} placeholder="艺术家" value={form.artist} onChange={e => setForm({ ...form, artist: e.target.value })} required />
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>FLAC 音频文件</label>
+            <input type="file" accept=".flac,audio/flac" onChange={e => e.target.files[0] && handleFileUpload(e.target.files[0], 'src')} style={{ fontSize: '0.85rem' }} />
+            {form.src && <div style={{ fontSize: '0.8rem', color: 'var(--accent-blue)', marginTop: '4px' }}>{form.src.split('/').pop()}</div>}
+          </div>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>封面图（可选）</label>
+            <input type="file" accept="image/*" onChange={e => e.target.files[0] && handleFileUpload(e.target.files[0], 'cover')} style={{ fontSize: '0.85rem' }} />
+            {form.cover && <img src={form.cover} alt="封面预览" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', marginTop: '4px' }} />}
+          </div>
+          <input style={inputStyle} type="number" placeholder="排序" value={form.order} onChange={e => setForm({ ...form, order: parseInt(e.target.value) || 0 })} />
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button type="submit" className="nav-button" style={{ padding: '6px 14px', border: 'none', cursor: 'pointer' }}>{editing === 'new' ? '添加' : '保存'}</button>
+            <button type="button" onClick={() => setEditing(null)} style={{ padding: '6px 14px', borderRadius: '20px', border: '1px solid rgba(0,0,0,0.1)', background: 'none', cursor: 'pointer' }}>取消</button>
+          </div>
+        </form>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {music.map((m) => (
+          <div key={m._id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: 'rgba(255,255,255,0.3)', borderRadius: '10px' }}>
+            {m.cover ? (
+              <img src={m.cover} alt={m.title} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'rgba(160,216,239,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>♪</div>
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 500, fontSize: '0.9rem' }}>{m.title}</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{m.artist}</div>
+            </div>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button onClick={() => startEdit(m)} style={{ padding: '4px 10px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'none', cursor: 'pointer', fontSize: '0.8rem' }}>编辑</button>
+              <button onClick={() => onDelete(m._id)} style={{ padding: '4px 10px', borderRadius: '8px', border: '1px solid rgba(255,107,107,0.3)', background: 'rgba(255,107,107,0.05)', color: '#ff6b6b', cursor: 'pointer', fontSize: '0.8rem' }}>删除</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ========== 壁纸管理 Tab ==========
+const WallpaperTab = ({ wallpapers, onDelete, onRefresh, showMessage, setError }) => {
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ src: '', theme: 'both', order: 0, active: true });
+
+  const startAdd = () => {
+    setEditing('new');
+    setForm({ src: '', theme: 'both', order: wallpapers.length, active: false });
+  };
+
+  const startEdit = (w) => {
+    setEditing(w._id);
+    setForm({ src: w.src, theme: w.theme, order: w.order || 0, active: w.active });
+  };
+
+  const handleImageUpload = async (file) => {
+    try {
+      const res = await uploadAPI.uploadImage(file);
+      setForm({ ...form, src: res.url });
+      showMessage('图片上传成功');
+    } catch (err) {
+      setError(err.response?.data?.error || '上传失败');
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editing === 'new') {
+        await wallpaperAPI.create(form);
+        showMessage('添加成功');
+      } else {
+        await wallpaperAPI.update(editing, form);
+        showMessage('更新成功');
+      }
+      setEditing(null);
+      onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || '操作失败');
+    }
+  };
+
+  const toggleActive = async (w) => {
+    try {
+      await wallpaperAPI.update(w._id, { active: !w.active });
+      onRefresh();
+    } catch (err) {
+      setError('操作失败');
+    }
+  };
+
+  const inputStyle = { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', color: 'var(--text-ink)', outline: 'none', boxSizing: 'border-box', marginBottom: '12px' };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h3 style={{ margin: 0, fontSize: '1rem' }}>壁纸列表 ({wallpapers.length})</h3>
+        <button onClick={startAdd} className="nav-button" style={{ padding: '6px 14px', border: 'none', cursor: 'pointer' }}>
+          + 添加壁纸
+        </button>
+      </div>
+
+      {editing && (
+        <form onSubmit={handleSubmit} style={{ marginBottom: '24px', padding: '16px', background: 'rgba(160,216,239,0.05)', borderRadius: '12px' }}>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>壁纸图片</label>
+            <input type="file" accept="image/*" onChange={e => e.target.files[0] && handleImageUpload(e.target.files[0])} style={{ fontSize: '0.85rem' }} />
+            {form.src && <img src={form.src} alt="预览" style={{ width: '120px', height: '68px', objectFit: 'cover', borderRadius: '8px', marginTop: '8px' }} />}
+          </div>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>主题</label>
+            <select value={form.theme} onChange={e => setForm({ ...form, theme: e.target.value })} style={{ ...inputStyle, marginBottom: 0 }}>
+              <option value="both">亮色 + 暗色</option>
+              <option value="light">仅亮色</option>
+              <option value="dark">仅暗色</option>
+            </select>
+          </div>
+          <input style={inputStyle} type="number" placeholder="排序" value={form.order} onChange={e => setForm({ ...form, order: parseInt(e.target.value) || 0 })} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', cursor: 'pointer', fontSize: '0.9rem' }}>
+            <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} />
+            启用（显示在首页轮播中）
+          </label>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button type="submit" className="nav-button" style={{ padding: '6px 14px', border: 'none', cursor: 'pointer' }}>{editing === 'new' ? '添加' : '保存'}</button>
+            <button type="button" onClick={() => setEditing(null)} style={{ padding: '6px 14px', borderRadius: '20px', border: '1px solid rgba(0,0,0,0.1)', background: 'none', cursor: 'pointer' }}>取消</button>
+          </div>
+        </form>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {wallpapers.map((w) => (
+          <div key={w._id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: 'rgba(255,255,255,0.3)', borderRadius: '10px' }}>
+            <img src={w.src} alt="壁纸" style={{ width: '80px', height: '45px', objectFit: 'cover', borderRadius: '6px' }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                {w.theme === 'both' ? '亮+暗' : w.theme === 'light' ? '亮色' : '暗色'}
+                {' · '}排序 {w.order}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button onClick={() => toggleActive(w)} style={{ padding: '4px 10px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: w.active ? 'rgba(255,107,107,0.1)' : 'rgba(160,216,239,0.2)', cursor: 'pointer', fontSize: '0.8rem' }}>
+                {w.active ? '禁用' : '启用'}
+              </button>
+              <button onClick={() => startEdit(w)} style={{ padding: '4px 10px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'none', cursor: 'pointer', fontSize: '0.8rem' }}>编辑</button>
+              <button onClick={() => onDelete(w._id)} style={{ padding: '4px 10px', borderRadius: '8px', border: '1px solid rgba(255,107,107,0.3)', background: 'rgba(255,107,107,0.05)', color: '#ff6b6b', cursor: 'pointer', fontSize: '0.8rem' }}>删除</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

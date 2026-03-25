@@ -21,8 +21,14 @@ import Links from './pages/Links';
 import Chip from './pages/Chip';
 import ArticleDetail from './pages/ArticleDetail';
 import Login from './pages/Login';
+import UserLogin from './pages/UserLogin';
 import Admin from './pages/Admin';
+import Register from './pages/Register';
+import NotFound from './pages/NotFound';
+import ErrorBoundary from './components/ErrorBoundary';
+import WallpaperCarousel from './components/WallpaperCarousel';
 import useStore from './store/useStore';
+import { userAPI } from './api/index.js';
 
 function App() {
   const isSearchOpen = useStore((state) => state.isSearchOpen);
@@ -32,6 +38,8 @@ function App() {
   const location = useLocation();
   const isHome = location.pathname === '/';
 
+  const setUser = useStore((s) => s.setUser);
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
@@ -39,6 +47,16 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
+    if (token && savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch { /* ignore */ }
+    }
+  }, []);
 
   const setIsSearchOpen = (value) => {
     if (value) {
@@ -48,12 +66,9 @@ function App() {
     }
   };
 
-  const bgClass = isHome ? '' : 'bg-hidden';
-
   return (
     <>
-      <div className={`bg-image-layer ${bgClass}`}></div>
-      <div className={`bg-overlay-layer ${bgClass}`}></div>
+      <WallpaperCarousel isHome={isHome} theme={theme} />
 
       <SearchModal isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
       <ScrollProgress />
@@ -61,16 +76,21 @@ function App() {
       <BackToTop />
       <NavBar setIsSearchOpen={setIsSearchOpen} />
 
-      <Routes>
+      <ErrorBoundary>
+        <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/category" element={<Category />} />
         <Route path="/article/:slug" element={<ArticleDetail />} />
         <Route path="/links" element={<Links />} />
         <Route path="/about" element={<About />} />
         <Route path="/chip" element={<Chip />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Admin />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/user-login" element={<UserLogin />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
+      </ErrorBoundary>
 
       <Footer />
     </>

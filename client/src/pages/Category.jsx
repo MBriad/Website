@@ -106,20 +106,24 @@ const Category = () => {
 
       {/* 标签筛选 */}
       <motion.div variants={itemVariants} className="tag-filter">
-        <span
+        <button
           className={`tag-pill ${!activeTag ? 'tag-pill-active' : ''}`}
           onClick={() => setActiveTag(null)}
+          aria-pressed={!activeTag}
+          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
         >
           全部
-        </span>
+        </button>
         {allTags.map(tag => (
-          <span
+          <button
             key={tag}
             className={`tag-pill ${activeTag === tag ? 'tag-pill-active' : ''}`}
             onClick={() => setActiveTag(tag)}
+            aria-pressed={activeTag === tag}
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
             <TagIcon /> {tag}
-          </span>
+          </button>
         ))}
       </motion.div>
 
