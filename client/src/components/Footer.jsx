@@ -8,6 +8,7 @@ const Footer = () => {
       animate={{ opacity: 1 }}
       transition={{ delay: 1, duration: 0.8 }}
     >
+      <img src="/commend.jpg" alt="commend" className="footer-commend" />
       <div className="footer-text">
         © {new Date().getFullYear()} MBri の 小窝
       </div>
