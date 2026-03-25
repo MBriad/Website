@@ -105,14 +105,12 @@ const Category = () => {
         文章<span className="highlight-blue">归档</span>
       </motion.h1>
 
-      <div className="category-layout">
-        {/* 左侧：热力图 */}
-        <motion.aside variants={itemVariants} className="category-sidebar">
-          <ContributionHeatmap />
-        </motion.aside>
+      {/* 热力图 */}
+      <motion.div variants={itemVariants}>
+        <ContributionHeatmap />
+      </motion.div>
 
-        {/* 右侧：标签 + 时间线 */}
-        <div className="category-main">
+      {/* 标签筛选 */}
       <motion.div variants={itemVariants} className="tag-filter">
         <button
           className={`tag-pill ${!activeTag ? 'tag-pill-active' : ''}`}
@@ -180,9 +178,7 @@ const Category = () => {
         {filteredArticles.length === 0 && (
           <div className="timeline-empty">暂无相关文章</div>
         )}
-        </motion.div>
-        </div>
-      </div>
+      </motion.div>
     </motion.main>
   );
 };
