@@ -89,4 +89,20 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
     return { id: user._id, username: user.username, email: user.email, avatar: user.avatar, role: user.role };
   });
+
+  // 更新用户头像
+  fastify.put('/api/profile', { onRequest: [authMiddleware] }, async (request, reply) => {
+    const { userId } = (request as any).user;
+    const { avatar } = request.body as { avatar?: string };
+
+    if (!avatar) {
+      return reply.status(400).send({ error: '请提供头像 URL' });
+    }
+
+    const user = await User.findByIdAndUpdate(userId, { avatar }, { new: true }).select('-password');
+    if (!user) {
+      return reply.status(404).send({ error: '用户不存在' });
+    }
+    return { id: user._id, username: user.username, email: user.email, avatar: user.avatar, role: user.role };
+  });
 }

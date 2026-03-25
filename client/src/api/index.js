@@ -127,6 +127,7 @@ export const userAPI = {
   register: (username, email, password) => api.post('/register', { username, email, password }),
   login: (username, password) => api.post('/user-login', { username, password }),
   getProfile: () => api.get('/profile'),
+  updateProfile: (data) => api.put('/profile', data),
 };
 
 /**

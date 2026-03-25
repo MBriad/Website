@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import useStore from '../store/useStore';
+import { uploadAPI, userAPI } from '../api/index.js';
 import { HomeIcon, CategoryIcon, LinksIcon, ChipIcon, AboutIcon, SearchIcon, SunIcon, MoonIcon } from '../Icons';
 
 export default function NavBar({ setIsSearchOpen }) {
@@ -14,6 +15,7 @@ export default function NavBar({ setIsSearchOpen }) {
   const user = useStore((s) => s.user);
   const clearUser = useStore((s) => s.clearUser);
   const { scrollY } = useScroll();
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   
   // 1. 定义一个状态来记录"是否已滚动"
@@ -23,6 +25,20 @@ export default function NavBar({ setIsSearchOpen }) {
   // 首次加载标记：只在初始加载时播放入场动画，页面切换时不动
   const hasMounted = useRef(false);
   useEffect(() => { hasMounted.current = true; }, []);
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const res = await uploadAPI.uploadImage(file);
+      const updated = await userAPI.updateProfile({ avatar: res.url });
+      localStorage.setItem('user', JSON.stringify(updated));
+      setUser(updated);
+      setShowUserMenu(false);
+    } catch (err) {
+      console.error('头像上传失败:', err);
+    }
+  };
 
   // 3. 监听滚动位置，一旦超过 50px，就触发收缩状态
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -36,7 +52,20 @@ export default function NavBar({ setIsSearchOpen }) {
   // 4. 路由变化时关闭菜单
   useEffect(() => {
     setIsMenuOpen(false);
+    setShowUserMenu(false);
   }, [location.pathname]);
+
+  // 点击外部关闭用户菜单
+  const userMenuRef = useRef(null);
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    if (showUserMenu) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showUserMenu]);
 
   // 5. 定义文字的收缩动画 Variants
   // 当 isScrolled 为 true 时，宽度变为 0，同时完全透明
@@ -206,11 +235,33 @@ export default function NavBar({ setIsSearchOpen }) {
 
         {/* ================= 用户区域 ================= */}
         {user ? (
-          <div className="nav-user-info" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{user.username}</span>
-            <button onClick={clearUser} aria-label="退出登录" className="nav-user-logout" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-secondary)', padding: '4px 8px', borderRadius: '8px' }}>
-              退出
+          <div className="nav-user-info" style={{ position: 'relative' }} ref={userMenuRef}>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '20px' }}
+              aria-label="用户菜单"
+            >
+              {user.avatar ? (
+                <img src={user.avatar} alt="头像" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(160,216,239,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-blue)' }}>
+                  {user.username[0]}
+                </span>
+              )}
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{user.username}</span>
             </button>
+
+            {showUserMenu && (
+              <div className="nav-user-dropdown" style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '12px', padding: '8px', minWidth: '140px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', zIndex: 60 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', transition: 'background 0.15s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(160,216,239,0.15)'} onMouseOut={e => e.currentTarget.style.background = 'none'}>
+                  <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: 'none' }} />
+                  上传头像
+                </label>
+                <button onClick={() => { clearUser(); setShowUserMenu(false); }} style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.85rem', color: '#ff6b6b', transition: 'background 0.15s' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,107,107,0.1)'} onMouseOut={e => e.currentTarget.style.background = 'none'}>
+                  退出登录
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="nav-user-links" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
@@ -256,9 +307,22 @@ export default function NavBar({ setIsSearchOpen }) {
               <b>{theme === 'light' ? '切换暗色模式' : '切换亮色模式'}</b>
             </button>
             {user ? (
-              <button onClick={clearUser} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}>
-                <b>退出登录 ({user.username})</b>
-              </button>
+              <>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0', cursor: 'pointer' }}>
+                  <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: 'none' }} />
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="头像" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(160,216,239,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-blue)' }}>
+                      {user.username[0]}
+                    </span>
+                  )}
+                  <b>上传头像</b>
+                </label>
+                <button onClick={clearUser} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0', color: '#ff6b6b' }}>
+                  <b>退出登录 ({user.username})</b>
+                </button>
+              </>
             ) : (
               <>
                 <NavLink to="/user-login" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
