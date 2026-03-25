@@ -21,22 +21,18 @@
 
 /* 统一的胶囊底板样式：更白、更实，取消明显边框 */
 .glass-pill {
-  /* 背景色现在由 React 动画控制 rgba */
+  background-color: rgba(255, 255, 255, 0.85);
   border-radius: 50px;
-  /* padding 和 gap 现在由 React 动画控制 */
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  /* 非常轻柔的阴影 */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   font-size: 0.9rem;
-  /* 原图字体较小且精致 */
   color: var(--text-ink);
   height: 44px;
-  /* 固定高度，让所有胶囊完美对齐 */
   box-sizing: border-box;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 /* Logo 胶囊特殊样式 */
