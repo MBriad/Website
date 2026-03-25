@@ -113,20 +113,29 @@ const CommentSection = ({ articleId }) => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="comment-header">
-                <span className="comment-author">{comment.user.username}</span>
-                <span className="comment-date">{formatDate(comment.createdAt)}</span>
+              <div className="comment-avatar">
+                {comment.user.avatar ? (
+                  <img src={comment.user.avatar} alt={comment.user.username} />
+                ) : (
+                  <span>{comment.user.username[0]}</span>
+                )}
               </div>
-              <p className="comment-content">{comment.content}</p>
-              {user && (user.id === comment.user.id || user.role === 'admin') && (
-                <button
-                  className="comment-delete-btn"
-                  onClick={() => handleDelete(comment.id)}
-                  aria-label="删除评论"
-                >
-                  删除
-                </button>
-              )}
+              <div className="comment-body">
+                <div className="comment-header">
+                  <span className="comment-author">{comment.user.username}</span>
+                  <span className="comment-date">{formatDate(comment.createdAt)}</span>
+                </div>
+                <p className="comment-content">{comment.content}</p>
+                {user && (user.id === comment.user.id || user.role === 'admin') && (
+                  <button
+                    className="comment-delete-btn"
+                    onClick={() => handleDelete(comment.id)}
+                    aria-label="删除评论"
+                  >
+                    删除
+                  </button>
+                )}
+              </div>
             </motion.div>
           ))}
         </div>
