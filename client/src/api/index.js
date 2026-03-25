@@ -81,6 +81,7 @@ export const articleAPI = {
   create: (data) => api.post('/articles', data),
   update: (id, data) => api.put(`/articles/${id}`, data),
   remove: (id) => api.delete(`/articles/${id}`),
+  getHeatmap: () => api.get('/articles/stats/heatmap'),
 };
 
 /**

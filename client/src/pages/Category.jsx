@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { TagIcon } from '../Icons';
 import { articleAPI } from '../api/index.js';
 import Loading from '../components/Loading.jsx';
+import ContributionHeatmap from '../components/ContributionHeatmap.jsx';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -104,7 +105,14 @@ const Category = () => {
         文章<span className="highlight-blue">归档</span>
       </motion.h1>
 
-      {/* 标签筛选 */}
+      <div className="category-layout">
+        {/* 左侧：热力图 */}
+        <motion.aside variants={itemVariants} className="category-sidebar">
+          <ContributionHeatmap />
+        </motion.aside>
+
+        {/* 右侧：标签 + 时间线 */}
+        <div className="category-main">
       <motion.div variants={itemVariants} className="tag-filter">
         <button
           className={`tag-pill ${!activeTag ? 'tag-pill-active' : ''}`}
@@ -172,7 +180,9 @@ const Category = () => {
         {filteredArticles.length === 0 && (
           <div className="timeline-empty">暂无相关文章</div>
         )}
-      </motion.div>
+        </motion.div>
+        </div>
+      </div>
     </motion.main>
   );
 };

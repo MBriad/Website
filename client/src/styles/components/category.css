@@ -4,11 +4,30 @@
    7. 文章归档页
    ========================================= */
 .category-container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 120px 20px 10vh;
   position: relative;
   z-index: 1;
+}
+
+/* 两栏布局 */
+.category-layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.category-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+}
+
+.category-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .tag-filter {
@@ -143,6 +162,97 @@
   border-color: var(--bg-paper);
 }
 
+/* 热力图 */
+.heatmap-container {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.heatmap-title {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.heatmap-title span {
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.heatmap-scroll {
+  position: relative;
+}
+
+.heatmap-months {
+  position: relative;
+  height: 16px;
+  margin-bottom: 4px;
+}
+
+.heatmap-months span {
+  position: absolute;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+
+.heatmap-grid {
+  display: flex;
+  gap: 2px;
+}
+
+.heatmap-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heatmap-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.heatmap-cell:hover {
+  opacity: 0.7;
+}
+
+.heatmap-days {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heatmap-day-label {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  line-height: 12px;
+  height: 14px;
+}
+
+.heatmap-tooltip {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+}
+
+/* 暗色模式 */
+[data-theme='dark'] .heatmap-container {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .heatmap-tooltip {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 /* =========================================
    响应式布局
    ========================================= */
@@ -151,6 +261,25 @@
 @media (max-width: 768px) {
   .category-container {
     padding: 100px 16px 8vh;
+  }
+
+  .category-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .category-sidebar {
+    width: 100%;
+    position: static;
+  }
+
+  .heatmap-scroll {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .heatmap-grid {
+    min-width: fit-content;
   }
   
   .tag-filter {

@@ -99,4 +99,23 @@ export async function articleRoutes(fastify: FastifyInstance) {
 
     return { message: '文章已删除' };
   });
+
+  // 获取文章发表热力图数据（按日期统计）
+  fastify.get('/api/articles/stats/heatmap', async () => {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    const articles = await Article.find(
+      { published: true, createdAt: { $gte: oneYearAgo } },
+      { createdAt: 1 }
+    );
+
+    const heatmap: Record<string, number> = {};
+    articles.forEach((a) => {
+      const date = a.createdAt.toISOString().slice(0, 10);
+      heatmap[date] = (heatmap[date] || 0) + 1;
+    });
+
+    return heatmap;
+  });
 }
