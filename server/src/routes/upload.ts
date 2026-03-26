@@ -67,4 +67,33 @@ export async function uploadRoutes(fastify: FastifyInstance) {
       return reply.status(500).send({ error: '图片处理失败' });
     }
   });
+
+  // 壁纸上传（不压缩不转换，保留原画质）
+  fastify.post('/api/upload/wallpaper', {
+    onRequest: [authMiddleware],
+    bodyLimit: 200 * 1024 * 1024
+  }, async (request, reply) => {
+    const data = await request.file();
+    if (!data) return reply.status(400).send({ error: '请选择图片' });
+
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/bmp'];
+    if (!allowedMimes.includes(data.mimetype)) {
+      return reply.status(400).send({ error: '只支持 JPG、PNG、WebP、BMP 格式' });
+    }
+
+    const buffer = await data.toBuffer();
+    const ext = data.filename?.split('.').pop() || 'png';
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const filepath = join(uploadsDir, filename);
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        writeFile(filepath, buffer, (err) => err ? reject(err) : resolve());
+      });
+      return { url: `/uploads/${filename}`, filename };
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({ error: '壁纸保存失败' });
+    }
+  });
 }

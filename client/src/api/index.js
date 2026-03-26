@@ -165,14 +165,20 @@ export const wallpaperAPI = {
  * 上传 API
  */
 export const uploadAPI = {
-  uploadImage: async (file) => {
+  uploadImage: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await api.post('/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+    return api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return response;
-  }
+  },
+  uploadWallpaper: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/upload/wallpaper', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };
 
 /**

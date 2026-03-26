@@ -655,9 +655,9 @@ const WallpaperTab = ({ wallpapers, onDelete, onRefresh, showMessage, setError }
 
   const handleImageUpload = async (file) => {
     try {
-      const res = await uploadAPI.uploadImage(file);
+      const res = await uploadAPI.uploadWallpaper(file);
       setForm({ ...form, src: res.url });
-      showMessage('图片上传成功');
+      showMessage('壁纸上传成功');
     } catch (err) {
       setError(err.response?.data?.error || '上传失败');
     }

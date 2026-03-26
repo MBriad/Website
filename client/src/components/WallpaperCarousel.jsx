@@ -6,7 +6,7 @@ const WallpaperCarousel = ({ isHome, theme }) => {
   const [visible, setVisible] = useState(true);
   const hasFetched = useRef(false);
 
-  // 仅首次进入首页时获取壁纸列表，随机选一张
+  // 仅首次进入首页时获取壁纸列表，按队列顺序显示
   useEffect(() => {
     if (!isHome || hasFetched.current) return;
     hasFetched.current = true;
@@ -18,8 +18,9 @@ const WallpaperCarousel = ({ isHome, theme }) => {
           (w) => w.theme === theme || w.theme === 'both'
         );
         if (filtered.length > 0) {
-          const random = filtered[Math.floor(Math.random() * filtered.length)];
-          setWallpaper(random);
+          const idx = parseInt(sessionStorage.getItem('wpIdx') || '0', 10) % filtered.length;
+          sessionStorage.setItem('wpIdx', (idx + 1) % filtered.length);
+          setWallpaper(filtered[idx]);
         }
       } catch {
         // API 失败时使用纯色背景
