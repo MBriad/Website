@@ -145,6 +145,7 @@
    - [x] **创建 server/Dockerfile**：构建 TypeScript，运行 Node.js
    - [x] **环境变量分离**：创建 .env.production，配置 MONGODB_URI 等
    - [x] **Nginx 配置**：反向代理 /api 到 backend 服务，其余托管静态文件
+   - [ ] **Docker 实际部署测试**：待服务器环境
    - [ ] **HTTPS 配置**：使用 Let's Encrypt 或 Nginx + Certbot
    - [ ] **服务器部署**：git clone + docker-compose up -d
    - [ ] **(可选) 购买域名**：绑定到服务器 IP，配置 DNS
@@ -153,17 +154,50 @@
 
    - [x] **User 模型**：`server/src/models/User.ts`（username, email, password, avatar, role）
    - [x] **Comment 模型**：`server/src/models/Comment.ts`（articleId, userId, content）
-   - [x] **用户路由**：`POST /api/register`、`POST /api/user-login`、`GET /api/profile`
+   - [x] **用户路由**：`POST /api/register`、`POST /api/user-login`、`GET /api/profile`、`PUT /api/profile`
    - [x] **评论路由**：`GET /api/comments/:articleId`、`POST /api/comments`、`DELETE /api/comments/:id`
    - [x] **authMiddleware 更新**：JWT payload 支持 userId + role，新增 optionalAuthMiddleware
    - [x] **前端注册页**：`client/src/pages/Register.jsx`
    - [x] **前端用户登录页**：`client/src/pages/UserLogin.jsx`
-   - [x] **评论区组件**：`client/src/components/CommentSection.jsx`
-   - [x] **NavBar 用户状态**：已登录显示用户名+退出，未登录显示登录/注册
+   - [x] **评论区组件**：`client/src/components/CommentSection.jsx`（含用户头像显示）
+   - [x] **NavBar 用户状态**：已登录显示头像+用户名+下拉菜单（上传头像/退出）
+   - [x] **用户头像上传**：NavBar 下拉菜单上传头像，保存到用户资料
    - [x] **ArticleDetail 集成**：文章底部嵌入评论区
    - [x] **CSS 样式**：`client/src/styles/components/comments.css`
    - [x] **Server 测试**：`users.test.ts`（9 cases）、`comments.test.ts`（9 cases）
    - [x] **Client 测试**：`CommentSection.test.jsx`（4 cases）
+
+   ### 第九步 — 音乐播放器增强
+
+   - [x] **Music 模型**：`server/src/models/Music.ts`（title, artist, src, cover, order）
+   - [x] **音乐 CRUD 路由**：`GET/POST/PUT/DELETE /api/music`
+   - [x] **FLAC 文件上传**：扩展 upload.ts 支持音频格式
+   - [x] **播放器重写**：进度条+封面图+旋转碟片动画+播放模式+音量控制+播放列表
+   - [x] **播放列表**：可滚动列表+双击选择+播放中声波动画
+   - [x] **播放模式**：单曲循环/顺序播放/随机播放
+   - [x] **Admin 音乐管理**：新增"音乐"Tab（FLAC上传+封面上传+列表管理）
+   - [x] **Server 测试**：`music.test.ts`（9 cases）
+   - [x] **Client 测试**：`MusicPlayer.test.jsx`（5 cases）
+
+   ### 第十步 — 壁纸轮播管理
+
+   - [x] **Wallpaper 模型**：`server/src/models/Wallpaper.ts`（src, theme, order, active）
+   - [x] **壁纸 CRUD 路由**：`GET/POST/PUT/DELETE /api/wallpapers`
+   - [x] **壁纸专用上传**：`POST /api/upload/wallpaper`（保留原画质，不压缩不转格式）
+   - [x] **WallpaperCarousel 组件**：滚动隐藏+sessionStorage 队列切换
+   - [x] **Admin 壁纸管理**：新增"壁纸"Tab（上传+主题选择+启用/禁用+排序）
+   - [x] **Server 测试**：`wallpapers.test.ts`（7 cases）
+
+   ### 第十一步 — 无障碍 + 完善细节
+
+   - [x] **404 页面**：`client/src/pages/NotFound.jsx`
+   - [x] **ErrorBoundary**：`client/src/components/ErrorBoundary.jsx`
+   - [x] **无障碍修复**：div→button + aria-label + dialog 语义
+   - [x] **导航栏背景**：胶囊添加半透明背景，解决壁纸透过去看不清
+   - [x] **文章贡献热力图**：Category 页左侧 GitHub 风格热力图
+   - [x] **Footer 图片**：添加 commend 小图片
+   - [x] **测试基础设施**：Client vitest + @testing-library/react（17 cases）
+   - [x] **AGENTS.md 更新**：反映最新代码规范和测试命令
 
    ---
 
@@ -206,6 +240,31 @@
      articleId: ObjectId,    // ref Article
      userId: ObjectId,       // ref User
      content: String,        // max 1000 字符
+     createdAt: Date
+   }
+   ```
+
+   **Music (音乐)**
+   ```javascript
+   {
+     _id: ObjectId,
+     title: String,          // 歌曲标题
+     artist: String,         // 艺术家
+     src: String,            // FLAC 文件路径
+     cover: String?,         // 可选封面图
+     order: Number,          // 排序
+     createdAt: Date
+   }
+   ```
+
+   **Wallpaper (壁纸)**
+   ```javascript
+   {
+     _id: ObjectId,
+     src: String,            // 图片路径
+     theme: String,          // 'light' | 'dark' | 'both'
+     order: Number,          // 排序
+     active: Boolean,        // 是否启用
      createdAt: Date
    }
    ```
