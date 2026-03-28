@@ -1,0 +1,58 @@
+services:
+  # MongoDB 数据库
+  mongodb:
+    image: mongo:7
+    container_name: mbri-mongodb-prod
+    restart: unless-stopped
+    volumes:
+      - mongodb-data-prod:/data/db
+    # 端口不暴露到宿主机，仅 Docker 网络内部访问
+    environment:
+      MONGO_INITDB_DATABASE: mbri-website
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # 后端 API 服务
+  backend:
+    image: redol/website-backend:latest
+    container_name: mbri-backend-prod
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    volumes:
+      - ./server/uploads:/app/uploads
+      - ./server/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # 前端静态服务 (Nginx)
+  frontend:
+    image: redol/website-frontend:latest
+    container_name: mbri-frontend-prod
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  mongodb-data-prod:
