@@ -121,6 +121,14 @@ export const bannerAPI = {
   remove: (pageId) => api.delete(`/banners/${pageId}`),
 };
 
+export const socialLinkAPI = {
+  getList: () => api.get('/social-links'),
+  getAll: () => api.get('/social-links/all'),
+  create: (data) => api.post('/social-links', data),
+  update: (id, data) => api.put(`/social-links/${id}`, data),
+  delete: (id) => api.delete(`/social-links/${id}`),
+};
+
 /**
  * 登录 API（管理员）
  */

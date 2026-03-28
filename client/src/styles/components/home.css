@@ -94,7 +94,6 @@
   transform: scale(1.1);
 }
 
-.glass-icon .iconify,
 .glass-icon svg {
   font-size: 28px;
   color: var(--text-ink);
