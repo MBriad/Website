@@ -1,19 +1,20 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import Fastify, { FastifyInstance } from 'fastify';
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { authRoutes } from '../routes/auth.js';
+import { User } from '../models/User.js';
 import { JWT_CONFIG } from '../config/jwt.js';
 
 describe('POST /api/login', () => {
   let app: FastifyInstance;
-  const testHash = bcrypt.hashSync('testpass', 10);
+  let mongoServer: MongoMemoryServer;
 
   beforeAll(async () => {
-    process.env.ADMIN_USERNAME = 'testadmin';
-    process.env.ADMIN_PASSWORD_HASH = testHash;
-    process.env.JWT_SECRET = 'test-secret';
-
+    mongoServer = await MongoMemoryServer.create();
+    await mongoose.connect(mongoServer.getUri());
     app = Fastify({ logger: false });
     await app.register(authRoutes);
     await app.ready();
@@ -21,12 +22,30 @@ describe('POST /api/login', () => {
 
   afterAll(async () => {
     await app.close();
-    delete process.env.ADMIN_USERNAME;
-    delete process.env.ADMIN_PASSWORD_HASH;
-    delete process.env.JWT_SECRET;
+    await mongoose.disconnect();
+    await mongoServer.stop();
   });
 
-  it('should return token on valid credentials', async () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+  });
+
+  // 创建管理员用户辅助函数
+  const createAdminUser = async (username = 'testadmin', password = 'testpass') => {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const adminUser = new User({ 
+      username, 
+      email: `${username}@test.com`, 
+      password: hashedPassword, 
+      role: 'admin' 
+    });
+    await adminUser.save();
+    return adminUser;
+  };
+
+  it('should return token on valid credentials for admin user', async () => {
+    await createAdminUser();
+    
     const res = await app.inject({
       method: 'POST',
       url: '/api/login',
@@ -38,8 +57,13 @@ describe('POST /api/login', () => {
     expect(body).toHaveProperty('token');
     expect(typeof body.token).toBe('string');
 
-    const decoded = jwt.verify(body.token, JWT_CONFIG.secret) as { username: string };
+    const decoded = jwt.verify(body.token, JWT_CONFIG.secret) as { 
+      userId: string; 
+      username: string; 
+      role: string 
+    };
     expect(decoded.username).toBe('testadmin');
+    expect(decoded.role).toBe('admin');
   });
 
   it('should return 400 when username is missing', async () => {
@@ -65,6 +89,8 @@ describe('POST /api/login', () => {
   });
 
   it('should return 401 on wrong username', async () => {
+    await createAdminUser();
+    
     const res = await app.inject({
       method: 'POST',
       url: '/api/login',
@@ -76,6 +102,8 @@ describe('POST /api/login', () => {
   });
 
   it('should return 401 on wrong password', async () => {
+    await createAdminUser();
+    
     const res = await app.inject({
       method: 'POST',
       url: '/api/login',
@@ -86,22 +114,24 @@ describe('POST /api/login', () => {
     expect(res.json().error).toBe('用户名或密码错误');
   });
 
-  it('should return 500 when env vars are not configured', async () => {
-    const savedUsername = process.env.ADMIN_USERNAME;
-    const savedHash = process.env.ADMIN_PASSWORD_HASH;
-    delete process.env.ADMIN_USERNAME;
-    delete process.env.ADMIN_PASSWORD_HASH;
-
+  it('should return 401 for non-admin user', async () => {
+    // 创建普通用户（非管理员）
+    const hashedPassword = await bcrypt.hash('testpass', 10);
+    const regularUser = new User({ 
+      username: 'regularuser', 
+      email: 'regular@test.com', 
+      password: hashedPassword, 
+      role: 'user' 
+    });
+    await regularUser.save();
+    
     const res = await app.inject({
       method: 'POST',
       url: '/api/login',
-      payload: { username: 'testadmin', password: 'testpass' },
+      payload: { username: 'regularuser', password: 'testpass' },
     });
 
-    expect(res.statusCode).toBe(500);
-    expect(res.json().error).toBe('服务器配置错误');
-
-    process.env.ADMIN_USERNAME = savedUsername;
-    process.env.ADMIN_PASSWORD_HASH = savedHash;
+    expect(res.statusCode).toBe(401);
+    expect(res.json().error).toBe('用户名或密码错误');
   });
 });

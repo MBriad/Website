@@ -32,7 +32,12 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
+    
+    // 检查是否已有管理员
+    const adminCount = await User.countDocuments({ role: 'admin' });
+    const role = adminCount === 0 ? 'admin' : 'user';
+    
+    const user = new User({ username, email, password: hashedPassword, role });
     await user.save();
 
     const token = jwt.sign(

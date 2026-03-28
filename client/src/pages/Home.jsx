@@ -175,15 +175,17 @@ const Home = () => {
         />
 
         {/* 合并后的大毛玻璃框 - 引言 + 社交图标 */}
-        {socialLinks.length > 0 && (
-          <div className="glass-quote-box">
+        <div className="glass-quote-box">
+          {socialLinks.length > 0 && (
             <span className="glass-arrow left" onClick={() => setSelectedSocialIndex((selectedSocialIndex - 1 + socialLinks.length) % socialLinks.length)}>❮</span>
-            
-            <div className="glass-content">
-              <p className="glass-text">
-                {quote.displayText}
-                <span className="typewriter-cursor"></span>
-              </p>
+          )}
+          
+          <div className="glass-content">
+            <p className="glass-text">
+              {quote.displayText}
+              <span className="typewriter-cursor"></span>
+            </p>
+            {socialLinks.length > 0 && (
               <a 
                 href={socialLinks[selectedSocialIndex].url} 
                 target="_blank" 
@@ -192,11 +194,13 @@ const Home = () => {
               >
                 <SocialIcon iconName={socialLinks[selectedSocialIndex].icon} />
               </a>
-            </div>
-            
-            <span className="glass-arrow right" onClick={() => setSelectedSocialIndex((selectedSocialIndex + 1) % socialLinks.length)}>❯</span>
+            )}
           </div>
-        )}
+          
+          {socialLinks.length > 0 && (
+            <span className="glass-arrow right" onClick={() => setSelectedSocialIndex((selectedSocialIndex + 1) % socialLinks.length)}>❯</span>
+          )}
+        </div>
 
         <motion.div
           className="scroll-hint"

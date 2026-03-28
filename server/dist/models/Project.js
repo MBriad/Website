@@ -3,6 +3,7 @@ const ProjectSchema = new Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     cover: { type: String },
+    category: { type: String },
     techStack: [{ type: String }],
     github: { type: String },
     demo: { type: String },

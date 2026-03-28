@@ -1,5 +1,5 @@
 # 构建阶段
-FROM registry.cn-shanghai.aliyuncs.com/library/node:20-alpine AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 # 运行阶段
-FROM registry.cn-shanghai.aliyuncs.com/library/nginx:alpine
+FROM nginx:alpine
 
 # 复制 nginx 配置
 COPY nginx.conf /etc/nginx/conf.d/default.conf

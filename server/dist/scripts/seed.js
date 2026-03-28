@@ -22,10 +22,26 @@ async function seed() {
         await Link.deleteMany({});
         await SiteConfig.deleteMany({});
         // 导入数据
-        await Article.insertMany(articlesData.articles);
-        await Project.insertMany(projectsData.projects);
+        const articlesWithContent = articlesData.articles.map((article) => ({
+            ...article,
+            content: article.content || article.excerpt, // 如果没有 content 字段，使用 excerpt
+            published: article.published !== false, // 默认为 true
+            featured: article.featured || false,
+            createdAt: article.date ? new Date(article.date) : new Date(),
+            updatedAt: new Date()
+        }));
+        await Article.insertMany(articlesWithContent);
+        const projectsWithTechStack = projectsData.projects.map((project) => ({
+            ...project,
+            techStack: project.techStack || project.tech || [], // 兼容 tech 和 techStack 字段
+            createdAt: new Date()
+        }));
+        await Project.insertMany(projectsWithTechStack);
         await Link.insertMany(linksData.links);
-        await SiteConfig.create(siteConfigData);
+        await SiteConfig.create({
+            ...siteConfigData,
+            avatar: siteConfigData.avatar || '/avatar.jpg' // 如果没有 avatar 字段，使用默认值
+        });
         console.log('✅ 数据迁移完成');
         process.exit(0);
     }

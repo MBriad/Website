@@ -3,6 +3,7 @@ export interface IProject extends Document {
     title: string;
     description: string;
     cover?: string;
+    category?: string;
     techStack: string[];
     github?: string;
     demo?: string;

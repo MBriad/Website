@@ -33,6 +33,10 @@ describe('User routes', () => {
   // ---- POST /api/register ----
 
   it('register: creates user and returns token', async () => {
+    // 先创建一个管理员用户，这样新注册的用户就是普通用户
+    const adminHash = await bcrypt.hash('adminpass', 10);
+    await User.create({ username: 'existingadmin', email: 'admin@test.com', password: adminHash, role: 'admin' });
+    
     const res = await app.inject({
       method: 'POST',
       url: '/api/register',
@@ -78,6 +82,44 @@ describe('User routes', () => {
     });
     expect(res.statusCode).toBe(409);
     expect(res.json().error).toBe('用户名已存在');
+  });
+
+  it('register: first user becomes admin', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/register',
+      payload: { username: 'firstuser', email: 'first@test.com', password: '123456' },
+    });
+    expect(res.statusCode).toBe(201);
+    const body = res.json();
+    expect(body.user.role).toBe('admin');
+    
+    // 验证数据库中用户确实是管理员
+    const user = await User.findOne({ username: 'firstuser' });
+    expect(user?.role).toBe('admin');
+  });
+
+  it('register: second user becomes regular user', async () => {
+    // 第一个用户成为管理员
+    await app.inject({
+      method: 'POST',
+      url: '/api/register',
+      payload: { username: 'adminuser', email: 'admin@test.com', password: '123456' },
+    });
+    
+    // 第二个用户
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/register',
+      payload: { username: 'regularuser', email: 'regular@test.com', password: '123456' },
+    });
+    expect(res.statusCode).toBe(201);
+    const body = res.json();
+    expect(body.user.role).toBe('user');
+    
+    // 验证数据库中用户角色
+    const user = await User.findOne({ username: 'regularuser' });
+    expect(user?.role).toBe('user');
   });
 
   // ---- POST /api/user-login ----
