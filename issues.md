@@ -18,3 +18,25 @@
 ## [前端/组件] NavBar 滚动收缩动画优化
 - **状态**: 已解决
 - **方案**: 使用 Framer Motion layout 属性 + useScroll 监听，文字宽度坍缩动画
+
+## [部署/Docker] 镜像拉取失败
+- **状态**: 已解决
+- **原因**: 
+  - DaoCloud 私有仓库需认证
+  - Docker Hub 国内网络访问超时
+  - 阿里云镜像路径格式不正确
+- **方案**: 
+  - 使用本地已有镜像：`docker-compose up`（不加 --build）
+  - 或登录镜像仓库后重新构建
+  - 修改 Dockerfile 镜像源为正确格式
+
+## [后端/环境] MongoDB 连接失败
+- **状态**: 已解决
+- **原因**: 
+  - 本地未启动 MongoDB 服务，连接 localhost:27017 被拒绝
+  - 之前使用本地 Windows MongoDB 服务，后来改用 Docker MongoDB 容器，需要确保 Docker 容器在运行
+- **采用方案**: 方案 2 ✅（启动 Docker MongoDB 容器，用 localhost:27017 连接）
+  - 方案 1：本地安装并启动 MongoDB（Windows 服务）
+  - **方案 2**：启动 Docker MongoDB 容器，确保端口映射 `27017:27017` 存在，再用 localhost 连接
+  - 方案 3：只运行 MongoDB 容器 + 本地后端分离使用
+- **验证**: `netstat -ano | findstr ":27017"` 检查端口是否监听

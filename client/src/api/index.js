@@ -114,6 +114,13 @@ export const configAPI = {
   update: (data) => api.put('/config', data),
 };
 
+export const bannerAPI = {
+  getAll: () => api.get('/banners'),
+  getByPage: (pageId) => api.get(`/banners/${pageId}`),
+  update: (pageId, data) => api.put(`/banners/${pageId}`, data),
+  remove: (pageId) => api.delete(`/banners/${pageId}`),
+};
+
 /**
  * 登录 API（管理员）
  */

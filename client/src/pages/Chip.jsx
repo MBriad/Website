@@ -91,24 +91,38 @@ const Chip = () => {
             {project.featured && (
               <div className="chip-featured">精选</div>
             )}
-            <h3 className="chip-title">{project.title}</h3>
-            <p className="chip-desc">{project.description}</p>
-            <div className="chip-tech">
-              {project.techStack.map(tech => (
-                <span key={tech} className="tech-badge">{tech}</span>
-              ))}
+            <div className="chip-content-wrapper">
+              <div className="chip-text-box">
+                <h3 className="chip-title">{project.title}</h3>
+                <p className="chip-desc">{project.description}</p>
+                <div className="chip-tech">
+                  {project.techStack.map(tech => (
+                    <span key={tech} className="tech-badge">{tech}</span>
+                  ))}
+                </div>
+              </div>
+              {project.cover && (
+                <div className="chip-image-box">
+                  <img src={project.cover} alt={project.title} />
+                </div>
+              )}
             </div>
-            <div className="chip-links">
-              {project.github && (
-                <a href={project.github} target="_blank" rel="noopener noreferrer">
-                  <GithubIcon /> 源码
-                </a>
-              )}
-              {project.demo && (
-                <a href={project.demo} target="_blank" rel="noopener noreferrer">
-                  <ArrowIcon /> Demo
-                </a>
-              )}
+            <div className="chip-meta">
+              <span>{new Date(project.createdAt).toLocaleDateString('zh-CN')}</span>
+              {project.category && <span>| {project.category}</span>}
+              <span>|</span>
+              <div className="chip-links">
+                {project.github && (
+                  <a href={project.github} target="_blank" rel="noopener noreferrer">
+                    <GithubIcon /> 源码
+                  </a>
+                )}
+                {project.demo && (
+                  <a href={project.demo} target="_blank" rel="noopener noreferrer">
+                    <ArrowIcon /> Demo
+                  </a>
+                )}
+              </div>
             </div>
           </motion.div>
         ))}

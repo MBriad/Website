@@ -19,6 +19,7 @@ import { userRoutes } from './routes/users.js';
 import { commentRoutes } from './routes/comments.js';
 import { musicRoutes } from './routes/music.js';
 import { wallpaperRoutes } from './routes/wallpapers.js';
+import { bannerRoutes } from './routes/banners.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -85,6 +86,9 @@ async function registerPlugins() {
 
 // 注册路由
 async function registerRoutes() {
+  // 健康检查
+  fastify.get('/api/health', async () => ({ status: 'ok' }));
+
   await fastify.register(authRoutes);
   await fastify.register(userRoutes);
   await fastify.register(articleRoutes);
@@ -95,6 +99,7 @@ async function registerRoutes() {
   await fastify.register(commentRoutes);
   await fastify.register(musicRoutes);
   await fastify.register(wallpaperRoutes);
+  await fastify.register(bannerRoutes);
 }
 
 // 启动服务器

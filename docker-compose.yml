@@ -30,6 +30,12 @@ services:
     volumes:
       - ./server/uploads:/app/uploads
       - ./server/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   # 前端静态服务 (Nginx)
   frontend:
@@ -40,10 +46,17 @@ services:
     container_name: mbri-frontend
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "80:80"
       - "443:443"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 volumes:
   mongodb-data:

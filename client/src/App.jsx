@@ -14,6 +14,7 @@ import ScrollProgress from './components/ScrollProgress';
 import MusicPlayer from './components/MusicPlayer';
 import BackToTop from './components/BackToTop';
 import Footer from './components/Footer';
+import PageBanner from './components/PageBanner';
 import Home from './pages/Home';
 import Category from './pages/Category';
 import About from './pages/About';
@@ -37,6 +38,8 @@ function App() {
   const theme = useStore((state) => state.theme);
   const location = useLocation();
   const isHome = location.pathname === '/';
+  const noBannerPaths = ['/login', '/user-login', '/register', '/admin'];
+  const showPageBanner = !isHome && !noBannerPaths.includes(location.pathname);
 
   const setUser = useStore((s) => s.setUser);
 
@@ -75,6 +78,8 @@ function App() {
       <MusicPlayer />
       <BackToTop />
       <NavBar setIsSearchOpen={setIsSearchOpen} />
+
+      {showPageBanner && <PageBanner pathname={location.pathname} theme={theme} />}
 
       <ErrorBoundary>
         <Routes>

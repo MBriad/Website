@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MDEditor from '@uiw/react-md-editor';
-import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI } from '../api/index.js';
+import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI, bannerAPI } from '../api/index.js';
 import Loading from '../components/Loading.jsx';
 
 const TABS = [
@@ -15,13 +15,14 @@ const TABS = [
   { key: 'links', label: '友链' },
   { key: 'music', label: '音乐' },
   { key: 'wallpapers', label: '壁纸' },
+  { key: 'banners', label: '页面横幅' },
   { key: 'config', label: '配置' },
 ];
 
 const Admin = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('articles');
-  const [data, setData] = useState({ articles: [], projects: [], links: [], music: [], wallpapers: [], config: null });
+  const [data, setData] = useState({ articles: [], projects: [], links: [], music: [], wallpapers: [], banners: [], config: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -39,12 +40,13 @@ const Admin = () => {
     setLoading(true);
     setError('');
     try {
-      const [articles, projects, links, music, wallpapers, config] = await Promise.all([
+      const [articles, projects, links, music, wallpapers, banners, config] = await Promise.all([
         articleAPI.getList(),
         projectAPI.getList(),
         linkAPI.getList(),
         musicAPI.getList().catch(() => []),
         wallpaperAPI.getAll().catch(() => []),
+        bannerAPI.getAll().catch(() => []),
         configAPI.get().catch(() => null),
       ]);
       setData({
@@ -53,6 +55,7 @@ const Admin = () => {
         links: links || [],
         music: music || [],
         wallpapers: wallpapers || [],
+        banners: banners || [],
         config,
       });
     } catch (err) {
@@ -194,6 +197,16 @@ const Admin = () => {
           <WallpaperTab
             wallpapers={data.wallpapers}
             onDelete={(id) => handleDelete('wallpapers', id)}
+            onRefresh={fetchData}
+            showMessage={showMessage}
+            setError={setError}
+          />
+        )}
+
+        {/* 页面横幅管理 */}
+        {activeTab === 'banners' && (
+          <BannerTab
+            banners={data.banners}
             onRefresh={fetchData}
             showMessage={showMessage}
             setError={setError}
@@ -349,10 +362,11 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
 // ========== 项目 Tab ==========
 const ProjectTab = ({ projects, onDelete, onRefresh, showMessage, setError }) => {
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ title: '', description: '', techStack: '', github: '', demo: '', featured: false });
+  const [form, setForm] = useState({ title: '', description: '', cover: '', category: '', techStack: '', github: '', demo: '', featured: false });
+  const [uploading, setUploading] = useState(false);
 
   const startNew = () => {
-    setForm({ title: '', description: '', techStack: '', github: '', demo: '', featured: false });
+    setForm({ title: '', description: '', cover: '', category: '', techStack: '', github: '', demo: '', featured: false });
     setEditing('new');
   };
 
@@ -360,12 +374,29 @@ const ProjectTab = ({ projects, onDelete, onRefresh, showMessage, setError }) =>
     setForm({
       title: project.title,
       description: project.description,
+      cover: project.cover || '',
+      category: project.category || '',
       techStack: project.techStack.join(', '),
       github: project.github || '',
       demo: project.demo || '',
       featured: project.featured,
     });
     setEditing(project._id);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await uploadAPI.uploadImage(file);
+      setForm({ ...form, cover: res.url });
+      showMessage('封面图片上传成功');
+    } catch (err) {
+      setError(err.response?.data?.error || '上传失败');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -394,6 +425,21 @@ const ProjectTab = ({ projects, onDelete, onRefresh, showMessage, setError }) =>
         <h3 style={{ marginBottom: '16px' }}>{editing === 'new' ? '新建项目' : '编辑项目'}</h3>
         <input style={inputStyle} placeholder="标题" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
         <input style={inputStyle} placeholder="描述" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required />
+        
+        {/* 封面图片上传 */}
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>封面图片（横向 6:4 效果最佳）</label>
+          <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} style={{ fontSize: '0.85rem', marginBottom: '8px' }} />
+          {uploading && <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>上传中...</div>}
+          {form.cover && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src={form.cover} alt="封面预览" style={{ maxWidth: '200px', maxHeight: '120px', borderRadius: '8px', objectFit: 'cover' }} />
+              <button type="button" onClick={() => setForm({ ...form, cover: '' })} style={{ fontSize: '0.8rem', cursor: 'pointer', color: '#ff6b6b', background: 'none', border: 'none' }}>移除</button>
+            </div>
+          )}
+        </div>
+
+        <input style={inputStyle} placeholder="分类" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} />
         <input style={inputStyle} placeholder="技术栈 (逗号分隔)" value={form.techStack} onChange={e => setForm({ ...form, techStack: e.target.value })} />
         <input style={inputStyle} placeholder="GitHub 链接" value={form.github} onChange={e => setForm({ ...form, github: e.target.value })} />
         <input style={inputStyle} placeholder="Demo 链接" value={form.demo} onChange={e => setForm({ ...form, demo: e.target.value })} />
@@ -747,6 +793,130 @@ const WallpaperTab = ({ wallpapers, onDelete, onRefresh, showMessage, setError }
           </div>
         ))}
       </div>
+    </div>
+  );
+};
+
+// ========== 页面横幅 Tab ==========
+const BannerTab = ({ banners, onRefresh, showMessage, setError }) => {
+  const PAGE_BANNERS = [
+    { pageId: 'banner_category', name: '分类页' },
+    { pageId: 'banner_article', name: '文章详情页' },
+    { pageId: 'banner_links', name: '友链页' },
+    { pageId: 'banner_about', name: '关于我页' },
+    { pageId: 'banner_chip', name: '小玩具页' },
+  ];
+
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ src: '', theme: 'both', active: true });
+  const [uploading, setUploading] = useState(false);
+
+  const existingBanner = (pageId) => banners.find(b => b.pageId === pageId);
+
+  const startEdit = (pageId) => {
+    const existing = existingBanner(pageId);
+    setForm({
+      src: existing?.src || '',
+      theme: existing?.theme || 'both',
+      active: existing?.active ?? true,
+    });
+    setEditing(pageId);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await uploadAPI.uploadWallpaper(file);
+      setForm({ ...form, src: res.url });
+      showMessage('图片上传成功');
+    } catch (err) {
+      setError(err.response?.data?.error || '上传失败');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmit = async (pageId) => {
+    try {
+      await bannerAPI.update(pageId, form);
+      showMessage('横幅保存成功');
+      setEditing(null);
+      onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || '保存失败');
+    }
+  };
+
+  const handleDelete = async (pageId) => {
+    if (!confirm('确定删除该横幅？')) return;
+    try {
+      await bannerAPI.remove(pageId);
+      showMessage('删除成功');
+      onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || '删除失败');
+    }
+  };
+
+  const inputStyle = { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', color: 'var(--text-ink)', outline: 'none', boxSizing: 'border-box', marginBottom: '12px' };
+
+  return (
+    <div>
+      {PAGE_BANNERS.map((pb) => {
+        const banner = existingBanner(pb.pageId);
+        const isEditing = editing === pb.pageId;
+
+        return (
+          <div key={pb.pageId} style={{ marginBottom: '20px', padding: '16px', background: 'rgba(255,255,255,0.3)', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>{pb.name}</h3>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={() => startEdit(pb.pageId)} style={{ padding: '4px 12px', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.1)', background: 'none', cursor: 'pointer', fontSize: '0.8rem' }}>
+                  {banner ? '编辑' : '添加'}
+                </button>
+                {banner && (
+                  <button onClick={() => handleDelete(pb.pageId)} style={{ padding: '4px 12px', borderRadius: '16px', border: '1px solid rgba(255,107,107,0.3)', background: 'rgba(255,107,107,0.05)', color: '#ff6b6b', cursor: 'pointer', fontSize: '0.8rem' }}>
+                    删除
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {banner && !isEditing && (
+              <img src={banner.src} alt={pb.name} style={{ width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '8px' }} />
+            )}
+
+            {isEditing && (
+              <div style={{ marginTop: '12px' }}>
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>横幅图片</label>
+                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} style={{ fontSize: '0.85rem' }} />
+                  {uploading && <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>上传中...</div>}
+                  {form.src && <img src={form.src} alt="预览" style={{ width: '100%', maxHeight: '100px', objectFit: 'cover', borderRadius: '8px', marginTop: '8px' }} />}
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>主题</label>
+                  <select value={form.theme} onChange={e => setForm({ ...form, theme: e.target.value })} style={{ ...inputStyle, marginBottom: 0 }}>
+                    <option value="both">亮色 + 暗色</option>
+                    <option value="light">仅亮色</option>
+                    <option value="dark">仅暗色</option>
+                  </select>
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', cursor: 'pointer', fontSize: '0.9rem' }}>
+                  <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} />
+                  启用
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => handleSubmit(pb.pageId)} className="nav-button" style={{ padding: '6px 14px', border: 'none', cursor: 'pointer' }}>保存</button>
+                  <button onClick={() => setEditing(null)} style={{ padding: '6px 14px', borderRadius: '20px', border: '1px solid rgba(0,0,0,0.1)', background: 'none', cursor: 'pointer' }}>取消</button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

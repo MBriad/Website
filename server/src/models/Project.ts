@@ -4,6 +4,7 @@ export interface IProject extends Document {
   title: string;
   description: string;
   cover?: string;
+  category?: string;
   techStack: string[];
   github?: string;
   demo?: string;
@@ -15,6 +16,7 @@ const ProjectSchema = new Schema<IProject>({
   title: { type: String, required: true },
   description: { type: String, required: true },
   cover: { type: String },
+  category: { type: String },
   techStack: [{ type: String }],
   github: { type: String },
   demo: { type: String },
