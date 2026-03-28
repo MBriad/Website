@@ -1,9 +1,13 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { GithubIcon, MailIcon, ArrowIcon, TagIcon } from '../Icons';
+import { 
+  GithubIcon, MailIcon, ArrowIcon, TagIcon,
+  BilibiliIcon, TelegramIcon, TwitterIcon, DiscordIcon,
+  WeChatIcon, LinkedInIcon, InstagramIcon
+} from '../Icons';
 import useTypewriter from '../hooks/useTypewriter';
-import { articleAPI, projectAPI, configAPI } from '../api/index.js';
+import { articleAPI, projectAPI, configAPI, socialLinkAPI } from '../api/index.js';
 import Loading from '../components/Loading.jsx';
 
 const QUOTES = [
@@ -43,6 +47,51 @@ const FadeInCard = ({ children, className, style, whileHover }) => {
   );
 };
 
+// 社交图标组件 - 根据平台名称渲染对应的SVG图标
+const SocialIcon = ({ iconName, className }) => {
+  // 图标映射表：将数据库中的icon字段映射到对应的SVG组件
+  const iconMap = {
+    // 直接平台名称映射
+    'github': GithubIcon,
+    'mail': MailIcon,
+    'bilibili': BilibiliIcon,
+    'telegram': TelegramIcon,
+    'twitter': TwitterIcon,
+    'x': TwitterIcon, // Twitter现在叫X
+    'discord': DiscordIcon,
+    'wechat': WeChatIcon,
+    'linkedin': LinkedInIcon,
+    'instagram': InstagramIcon,
+    
+    // Iconify格式兼容（向后兼容）
+    'simple-icons:github': GithubIcon,
+    'simple-icons:bilibili': BilibiliIcon,
+    'simple-icons:telegram': TelegramIcon,
+    'simple-icons:twitter': TwitterIcon,
+    'simple-icons:discord': DiscordIcon,
+    'simple-icons:wechat': WeChatIcon,
+    'simple-icons:linkedin': LinkedInIcon,
+    'simple-icons:instagram': InstagramIcon,
+    'openmoji:github': GithubIcon,
+    'openmoji:mail': MailIcon,
+  };
+
+  // 查找对应的图标组件
+  const IconComponent = iconMap[iconName.toLowerCase()] || null;
+
+  if (!IconComponent) {
+    // 如果没有找到对应的图标，显示一个占位符
+    console.warn(`未找到图标: ${iconName}`);
+    return (
+      <span className={`icon-placeholder ${className || ''}`} style={{ fontSize: '28px' }}>
+        🔗
+      </span>
+    );
+  }
+
+  return <IconComponent className={className} />;
+};
+
 const Home = () => {
   const contentRef = useRef(null);
   const quote = useTypewriter(QUOTES);
@@ -51,6 +100,8 @@ const Home = () => {
   const [articles, setArticles] = useState([]);
   const [projects, setProjects] = useState([]);
   const [siteConfig, setSiteConfig] = useState(null);
+  const [socialLinks, setSocialLinks] = useState([]);
+  const [selectedSocialIndex, setSelectedSocialIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -62,10 +113,11 @@ const Home = () => {
         setError(null);
 
         // 并行获取文章、项目和网站配置
-        const [articlesRes, projectsRes, configRes] = await Promise.all([
+        const [articlesRes, projectsRes, configRes, linksRes] = await Promise.all([
           articleAPI.getList({ limit: 5 }),
           projectAPI.getList(),
           configAPI.get(),
+          socialLinkAPI.getList(),
         ]);
 
         // 设置文章数据
@@ -77,6 +129,9 @@ const Home = () => {
 
         // 设置网站配置
         setSiteConfig(configRes);
+
+        // 设置社交链接
+        setSocialLinks(linksRes || []);
       } catch (err) {
         console.error('Failed to fetch data:', err);
         setError(err.message);
@@ -119,34 +174,29 @@ const Home = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
         />
 
-        <div className="typewriter-quote">
-          {quote.displayText}
-          <span className="typewriter-cursor"></span>
-        </div>
-
-        <motion.div
-          className="hero-links"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-        >
-          <motion.a
-            href={siteConfig?.socialLinks?.github || "https://github.com"}
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ y: -2 }}
-            className="hero-link"
-          >
-            <GithubIcon /> GitHub
-          </motion.a>
-          <motion.a
-            href={siteConfig?.socialLinks?.email || "mailto:example@email.com"}
-            whileHover={{ y: -2 }}
-            className="hero-link"
-          >
-            <MailIcon /> 邮箱
-          </motion.a>
-        </motion.div>
+        {/* 合并后的大毛玻璃框 - 引言 + 社交图标 */}
+        {socialLinks.length > 0 && (
+          <div className="glass-quote-box">
+            <span className="glass-arrow left" onClick={() => setSelectedSocialIndex((selectedSocialIndex - 1 + socialLinks.length) % socialLinks.length)}>❮</span>
+            
+            <div className="glass-content">
+              <p className="glass-text">
+                {quote.displayText}
+                <span className="typewriter-cursor"></span>
+              </p>
+              <a 
+                href={socialLinks[selectedSocialIndex].url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`glass-icon ${socialLinks[selectedSocialIndex].icon}-icon`}
+              >
+                <SocialIcon iconName={socialLinks[selectedSocialIndex].icon} />
+              </a>
+            </div>
+            
+            <span className="glass-arrow right" onClick={() => setSelectedSocialIndex((selectedSocialIndex + 1) % socialLinks.length)}>❯</span>
+          </div>
+        )}
 
         <motion.div
           className="scroll-hint"

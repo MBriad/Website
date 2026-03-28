@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MDEditor from '@uiw/react-md-editor';
-import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI, bannerAPI } from '../api/index.js';
+import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI, bannerAPI, socialLinkAPI } from '../api/index.js';
 import Loading from '../components/Loading.jsx';
 
 const TABS = [
@@ -16,13 +16,14 @@ const TABS = [
   { key: 'music', label: '音乐' },
   { key: 'wallpapers', label: '壁纸' },
   { key: 'banners', label: '页面横幅' },
+  { key: 'socialLinks', label: '社交链接' },
   { key: 'config', label: '配置' },
 ];
 
 const Admin = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('articles');
-  const [data, setData] = useState({ articles: [], projects: [], links: [], music: [], wallpapers: [], banners: [], config: null });
+  const [data, setData] = useState({ articles: [], projects: [], links: [], music: [], wallpapers: [], banners: [], socialLinks: [], config: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -40,13 +41,14 @@ const Admin = () => {
     setLoading(true);
     setError('');
     try {
-      const [articles, projects, links, music, wallpapers, banners, config] = await Promise.all([
+      const [articles, projects, links, music, wallpapers, banners, socialLinks, config] = await Promise.all([
         articleAPI.getList(),
         projectAPI.getList(),
         linkAPI.getList(),
         musicAPI.getList().catch(() => []),
         wallpaperAPI.getAll().catch(() => []),
         bannerAPI.getAll().catch(() => []),
+        socialLinkAPI.getAll().catch(() => []),
         configAPI.get().catch(() => null),
       ]);
       setData({
@@ -56,6 +58,7 @@ const Admin = () => {
         music: music || [],
         wallpapers: wallpapers || [],
         banners: banners || [],
+        socialLinks: socialLinks || [],
         config,
       });
     } catch (err) {
@@ -207,6 +210,16 @@ const Admin = () => {
         {activeTab === 'banners' && (
           <BannerTab
             banners={data.banners}
+            onRefresh={fetchData}
+            showMessage={showMessage}
+            setError={setError}
+          />
+        )}
+
+        {/* 社交链接管理 */}
+        {activeTab === 'socialLinks' && (
+          <SocialLinkTab
+            links={data.socialLinks}
             onRefresh={fetchData}
             showMessage={showMessage}
             setError={setError}
@@ -918,6 +931,134 @@ const BannerTab = ({ banners, onRefresh, showMessage, setError }) => {
         );
       })}
     </div>
+  );
+};
+
+// ========== 社交链接 Tab ==========
+const SocialLinkTab = ({ links, onRefresh, showMessage, setError }) => {
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ name: '', url: '', icon: '', order: 0, active: true });
+
+  // 支持的社交平台列表（图标映射）
+  const supportedPlatforms = [
+    { value: 'github', label: 'GitHub' },
+    { value: 'mail', label: '邮箱' },
+    { value: 'bilibili', label: 'Bilibili' },
+    { value: 'telegram', label: 'Telegram' },
+    { value: 'twitter', label: 'Twitter/X' },
+    { value: 'discord', label: 'Discord' },
+    { value: 'wechat', label: '微信' },
+    { value: 'linkedin', label: 'LinkedIn' },
+    { value: 'instagram', label: 'Instagram' },
+    // 向后兼容的Iconify格式
+    { value: 'simple-icons:github', label: 'GitHub (Iconify)' },
+    { value: 'simple-icons:bilibili', label: 'Bilibili (Iconify)' },
+    { value: 'simple-icons:telegram', label: 'Telegram (Iconify)' },
+    { value: 'simple-icons:twitter', label: 'Twitter (Iconify)' },
+    { value: 'simple-icons:discord', label: 'Discord (Iconify)' },
+    { value: 'openmoji:github', label: 'GitHub (OpenMoji)' },
+    { value: 'openmoji:mail', label: '邮箱 (OpenMoji)' },
+  ];
+
+  const startNew = () => {
+    setForm({ name: '', url: '', icon: '', order: links.length, active: true });
+    setEditing('new');
+  };
+
+  const startEdit = (link) => {
+    setForm({
+      name: link.name,
+      url: link.url,
+      icon: link.icon,
+      order: link.order || 0,
+      active: link.active,
+    });
+    setEditing(link._id);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editing === 'new') {
+        await socialLinkAPI.create(form);
+        showMessage('社交链接创建成功');
+      } else {
+        await socialLinkAPI.update(editing, form);
+        showMessage('社交链接更新成功');
+      }
+      setEditing(null);
+      onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || '操作失败');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('确定删除该社交链接？')) return;
+    try {
+      await socialLinkAPI.delete(id);
+      showMessage('删除成功');
+      onRefresh();
+    } catch (err) {
+      setError(err.response?.data?.error || '删除失败');
+    }
+  };
+
+  const inputStyle = { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', color: 'var(--text-ink)', outline: 'none', boxSizing: 'border-box', marginBottom: '12px' };
+
+  if (editing) {
+    return (
+      <form onSubmit={handleSubmit}>
+        <h3 style={{ marginBottom: '16px' }}>{editing === 'new' ? '新建社交链接' : '编辑社交链接'}</h3>
+        <input style={inputStyle} placeholder="名称 (如: GitHub)" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+        <input style={inputStyle} placeholder="链接 URL" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} required />
+        <input 
+          style={inputStyle} 
+          placeholder="平台名称或Iconify标识符 (如: github, bilibili, simple-icons:telegram)" 
+          value={form.icon} 
+          onChange={e => setForm({ ...form, icon: e.target.value })}
+          list="platform-suggestions"
+          required 
+        />
+        <datalist id="platform-suggestions">
+          {supportedPlatforms.map(platform => (
+            <option key={platform.value} value={platform.value}>
+              {platform.label}
+            </option>
+          ))}
+        </datalist>
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: '4px', marginBottom: '12px' }}>
+          推荐使用平台名称（如: github, bilibili）以获得SVG图标支持，或输入Iconify标识符向后兼容
+        </div>
+        <input style={inputStyle} placeholder="排序 (数字)" type="number" value={form.order} onChange={e => setForm({ ...form, order: parseInt(e.target.value) || 0 })} />
+        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', marginBottom: '16px', cursor: 'pointer' }}>
+          <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} /> 启用
+        </label>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button type="submit" className="nav-button" style={{ border: 'none', cursor: 'pointer' }}>保存</button>
+          <button type="button" className="nav-button" style={{ border: 'none', cursor: 'pointer' }} onClick={() => setEditing(null)}>取消</button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <>
+      <button onClick={startNew} className="nav-button" style={{ border: 'none', cursor: 'pointer', marginBottom: '16px' }}>+ 新建社交链接</button>
+      {links.map(link => (
+        <div key={link._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'rgba(255,255,255,0.3)', borderRadius: '8px', marginBottom: '10px' }}>
+          <div>
+            <div style={{ fontWeight: 500 }}>{link.name}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>{link.icon}</div>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button style={{ padding: '4px 12px', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.1)', background: 'none', cursor: 'pointer', fontSize: '0.8rem' }} onClick={() => startEdit(link)}>编辑</button>
+            <button style={{ padding: '4px 12px', borderRadius: '16px', border: '1px solid rgba(255,107,107,0.3)', background: 'rgba(255,107,107,0.05)', color: '#ff6b6b', cursor: 'pointer', fontSize: '0.8rem' }} onClick={() => handleDelete(link._id)}>删除</button>
+          </div>
+        </div>
+      ))}
+      {links.length === 0 && <div style={{ color: 'var(--text-light)' }}>暂无社交链接</div>}
+    </>
   );
 };
 
