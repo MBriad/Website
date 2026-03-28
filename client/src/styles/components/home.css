@@ -39,6 +39,119 @@
   letter-spacing: 0.05em;
 }
 
+/* =========================================
+   合并后的大毛玻璃框
+   ========================================= */
+.glass-quote-box {
+  position: relative;
+  width: 90%;
+  max-width: 520px;
+  min-height: 110px;
+  padding: 25px 50px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.glass-text {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.3rem;
+  color: var(--text-ink);
+  text-align: center;
+  margin: 0;
+  line-height: 1.8;
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background-color: var(--accent-blue);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: cursor-blink 1s step-end infinite;
+}
+
+.glass-icon {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.glass-icon:hover {
+  transform: scale(1.1);
+}
+
+.glass-icon .iconify {
+  font-size: 28px;
+  color: var(--text-ink);
+}
+
+.glass-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #666;
+  cursor: pointer;
+  padding: 10px;
+  transition: color 0.3s ease;
+}
+
+.glass-arrow:hover {
+  color: #000;
+}
+
+.glass-arrow.left {
+  left: 15px;
+}
+
+.glass-arrow.right {
+  right: 15px;
+}
+
+/* =========================================
+   白色画框区域（滚动后出现）
+   ========================================= */
+.main-content-area {
+  max-width: 1100px;
+  margin: 40px auto 80px;
+  background-color: #FFFFFF;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  padding: 60px 40px;
+  position: relative;
+  z-index: 5;
+}
+
+/* =========================================
+   响应式适配
+   ========================================= */
+@media (max-width: 768px) {
+  .glass-quote-box {
+    padding: 20px 35px;
+    min-height: auto;
+  }
+  
+  .main-content-area {
+    margin: -20px 15px 40px;
+    padding: 30px 20px;
+  }
+}
+
 .typewriter-cursor {
   display: inline-block;
   width: 2px;
@@ -270,6 +383,26 @@
 
 [data-theme='dark'] .tech-badge {
   background-color: rgba(122, 184, 212, 0.2);
+}
+
+/* 暗色模式适配 - 引言框 */
+[data-theme='dark'] .glass-quote-box {
+  background: rgba(40, 40, 40, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme='dark'] .glass-arrow {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .glass-arrow:hover {
+  color: var(--text-ink);
+}
+
+/* 暗色模式适配 - 滚动提示 */
+[data-theme='dark'] .scroll-hint {
+  color: var(--text-secondary);
 }
 
 /* =========================================
