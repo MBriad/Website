@@ -40,3 +40,57 @@
   - **方案 2**：启动 Docker MongoDB 容器，确保端口映射 `27017:27017` 存在，再用 localhost 连接
   - 方案 3：只运行 MongoDB 容器 + 本地后端分离使用
 - **验证**: `netstat -ano | findstr ":27017"` 检查端口是否监听
+
+## [部署/SSH] 阿里云服务器SSH连接问题
+- **状态**: 已解决
+- **时间**: 2026-03-28
+- **服务器**: 阿里云 Ubuntu 24.04 (IP: 8.138.194.87)
+- **问题描述**: 
+  - 使用 `ubuntu` 用户连接失败：`Permission denied (publickey)`
+  - 使用 `root` 用户连接成功
+- **原因分析**: 
+  - 阿里云默认创建的 Ubuntu 实例可能没有 `ubuntu` 用户，或该用户未配置 SSH 密钥
+  - `root` 用户在创建实例时已配置密钥对
+- **采用方案**: 使用 `root` 用户连接 ✅
+  - 连接命令: `ssh -i C:/Users/MBri/.ssh/mbri_alibaba_cloud/id_ed25519 root@8.138.194.87`
+  - 后续创建 `deploy` 用户进行部署
+- **后续计划**: 
+  1. 以 `root` 用户连接
+  2. 创建 `deploy` 用户
+  3. 配置 SSH 密钥和安全设置
+  4. 使用 `deploy` 用户进行后续部署
+
+## [部署/阿里云] 阿里云服务器部署成功
+- **状态**: 已解决
+- **时间**: 2026-03-28 22:30
+- **服务器**: 阿里云 Ubuntu 24.04 (IP: 8.138.194.87)
+- **部署架构**: Docker + 阿里云ACR
+- **部署详情**:
+  - 镜像仓库: 阿里云容器镜像服务 (ACR)
+  - 镜像地址: `crpi-zu9n3xiqg04wacyr.cn-guangzhou.personal.cr.aliyuncs.com/mbri/`
+  - 服务组件: MongoDB 7, 后端 (Fastify), 前端 (Nginx + React)
+  - 部署方式: docker-compose.prod.yml
+- **完成步骤**:
+  1. ✅ 本地构建Docker镜像并推送到ACR
+  2. ✅ 服务器配置Docker镜像加速
+  3. ✅ 更新docker-compose.prod.yml使用ACR镜像
+  4. ✅ 从ACR拉取镜像并启动服务
+  5. ✅ 验证服务健康状态和网络访问
+- **访问地址**:
+  - 网站: http://8.138.194.87
+  - API健康检查: http://8.138.194.87/api/health
+- **安全配置**:
+  - ✅ 禁用root SSH登录
+  - ✅ 使用deploy用户部署
+  - ✅ 防火墙仅开放22,80,443端口
+  - ✅ MongoDB不暴露公网端口
+  - ✅ JWT_SECRET已生成强随机密钥
+- **监控配置**:
+  - ✅ 服务健康检查 (docker-compose healthcheck)
+  - ✅ 自动重启 (restart: unless-stopped)
+  - ✅ 数据持久化 (MongoDB volume)
+- **下一步**:
+  - 购买域名并配置DNS
+  - 配置HTTPS/SSL证书
+  - 设置定期备份脚本
+  - 配置监控告警
