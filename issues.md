@@ -94,3 +94,36 @@
   - 配置HTTPS/SSL证书
   - 设置定期备份脚本
   - 配置监控告警
+
+## [安全/配置] .env.production 安全修复
+- **状态**: 已解决
+- **时间**: 2026-03-28
+- **问题描述**: 
+  - `.env.production` 文件被提交到GitHub仓库
+  - 该文件包含JWT_SECRET等敏感配置
+  - 虽然当前使用的是占位符，但存在未来泄露风险
+- **风险评估**: 
+  - 当前风险: 低（JWT_SECRET是占位符）
+  - 未来风险: 高（可能不小心提交真实密钥）
+- **采用方案**: ✅ 修改.gitignore并从Git跟踪中移除
+  - 修改`.gitignore`文件，添加`.env.production`到忽略列表
+  - 使用`git rm --cached .env.production`从Git跟踪中移除
+  - 提交并推送到GitHub
+- **修复详情**:
+  - 修改文件: `.gitignore`
+  - 添加内容: `.env.production`（第11行）
+  - Git操作: `git rm --cached .env.production`
+  - 提交信息: "security: add .env.production to .gitignore and remove from tracking"
+- **验证结果**:
+  - ✅ GitHub仓库中不再包含`.env.production`文件
+  - ✅ 服务器JWT_SECRET是真实生成的强随机密钥
+  - ✅ `.gitignore`配置正确，防止未来意外提交
+- **安全状态**:
+  - 当前配置: 安全 ✅
+  - 服务器JWT_SECRET: `49950bd89fdbcedc38c54182d54212ffcf52eb994310eaf7cbf5a947c63efd1a` (64字符强随机密钥)
+  - 未来保护: 已配置.gitignore防止意外提交
+- **最佳实践**:
+  - 敏感配置文件不应该进入版本控制
+  - 生产环境密钥应在服务器上直接设置
+  - 定期轮换JWT_SECRET等敏感密钥
+  - 使用环境变量管理敏感配置
