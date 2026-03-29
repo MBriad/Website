@@ -193,20 +193,26 @@ export const uploadAPI = {
   uploadImage: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    // 移除手动Content-Type设置，让浏览器自动设置boundary
-    return api.post('/upload', formData);
+    // 显式设置Content-Type为multipart/form-data
+    return api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
   uploadAudio: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    // 移除手动Content-Type设置，让浏览器自动设置boundary
-    return api.post('/upload', formData);
+    // 显式设置Content-Type为multipart/form-data
+    return api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
   uploadWallpaper: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    // 移除手动Content-Type设置，让浏览器自动设置boundary
-    return api.post('/upload/wallpaper', formData);
+    // 显式设置Content-Type为multipart/form-data
+    return api.post('/upload/wallpaper', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
 };
 
