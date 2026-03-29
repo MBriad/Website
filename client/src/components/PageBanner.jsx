@@ -22,10 +22,19 @@ const getBannerKey = (pathname) => {
 const PageBanner = ({ pathname, theme }) => {
   const [banner, setBanner] = useState(null);
   const hasFetched = useRef(false);
+  const prevPathname = useRef(pathname);
 
   useEffect(() => {
     const bannerKey = getBannerKey(pathname);
-    if (!bannerKey || hasFetched.current) return;
+    if (!bannerKey) return;
+    
+    // 如果pathname改变，重置fetch状态
+    if (pathname !== prevPathname.current) {
+      hasFetched.current = false;
+      prevPathname.current = pathname;
+    }
+    
+    if (hasFetched.current) return;
     hasFetched.current = true;
 
     const fetchBanner = async () => {
@@ -34,10 +43,15 @@ const PageBanner = ({ pathname, theme }) => {
         if (data && data.active) {
           if (data.theme === 'both' || data.theme === theme) {
             setBanner(data);
+          } else {
+            setBanner(null); // 主题不匹配时清除banner
           }
+        } else {
+          setBanner(null); // 未激活或无数据时清除banner
         }
       } catch {
         // API 失败时使用纯色背景
+        setBanner(null);
       }
     };
     fetchBanner();

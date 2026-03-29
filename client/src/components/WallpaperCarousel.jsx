@@ -8,7 +8,14 @@ const WallpaperCarousel = ({ isHome, theme }) => {
 
   // 仅首次进入首页时获取壁纸列表，按队列顺序显示
   useEffect(() => {
-    if (!isHome || hasFetched.current) return;
+    if (!isHome) return;
+    
+    // 主题改变时重置fetch状态，重新获取壁纸
+    if (wallpaper && wallpaper.theme !== theme && wallpaper.theme !== 'both') {
+      hasFetched.current = false;
+    }
+    
+    if (hasFetched.current) return;
     hasFetched.current = true;
 
     const fetchWallpaper = async () => {
@@ -21,9 +28,12 @@ const WallpaperCarousel = ({ isHome, theme }) => {
           const idx = parseInt(sessionStorage.getItem('wpIdx') || '0', 10) % filtered.length;
           sessionStorage.setItem('wpIdx', (idx + 1) % filtered.length);
           setWallpaper(filtered[idx]);
+        } else {
+          setWallpaper(null); // 没有匹配主题的壁纸时清除
         }
       } catch {
         // API 失败时使用纯色背景
+        setWallpaper(null);
       }
     };
     fetchWallpaper();

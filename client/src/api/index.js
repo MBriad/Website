@@ -52,6 +52,16 @@ api.interceptors.response.use(
       return api(config);
     }
     
+    // 401 错误处理（认证失败）
+    if (error.response?.status === 401) {
+      console.warn('认证令牌已过期或无效，清除本地token');
+      localStorage.removeItem('token');
+      // 可选：重定向到登录页（如果不在登录页）
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    
     // 统一错误处理
     console.error('API Error:', error);
     
@@ -183,16 +193,20 @@ export const uploadAPI = {
   uploadImage: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    // 移除手动Content-Type设置，让浏览器自动设置boundary
+    return api.post('/upload', formData);
+  },
+  uploadAudio: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    // 移除手动Content-Type设置，让浏览器自动设置boundary
+    return api.post('/upload', formData);
   },
   uploadWallpaper: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/upload/wallpaper', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    // 移除手动Content-Type设置，让浏览器自动设置boundary
+    return api.post('/upload/wallpaper', formData);
   },
 };
 

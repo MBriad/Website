@@ -13,6 +13,7 @@ export default function NavBar({ setIsSearchOpen }) {
   const theme = useStore((s) => s.theme);
   const toggleTheme = useStore((s) => s.toggleTheme);
   const user = useStore((s) => s.user);
+  const setUser = useStore((s) => s.setUser);
   const clearUser = useStore((s) => s.clearUser);
   const { scrollY } = useScroll();
   const [showUserMenu, setShowUserMenu] = useState(false);

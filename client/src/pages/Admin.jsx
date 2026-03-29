@@ -616,10 +616,17 @@ const MusicTab = ({ music, onDelete, onRefresh, showMessage, setError }) => {
 
   const handleFileUpload = async (file, field) => {
     try {
-      const res = await uploadAPI.uploadImage(file);
+      // 根据字段类型选择上传函数
+      const uploadFn = field === 'src' ? uploadAPI.uploadAudio : uploadAPI.uploadImage;
+      const res = await uploadFn(file);
       setForm({ ...form, [field]: res.url });
       showMessage(`${field === 'cover' ? '封面' : '音频'}上传成功`);
     } catch (err) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        return;
+      }
       setError(err.response?.data?.error || '上传失败');
     }
   };

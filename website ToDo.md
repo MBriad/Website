@@ -205,6 +205,27 @@
     - [ ] **备份验证**：定期验证备份文件完整性和可恢复性
     - [ ] **配置自动化任务**：设置 cron 定时执行备份、健康检查、清理
 
+    ### 第九步 — Bug修复与优化（2026-03-28）
+
+    **已修复问题** ✅
+    - [x] **添加全局401错误处理**：`client/src/api/index.js` - 解决认证令牌过期问题，自动清除token并重定向到登录页
+    - [x] **修复音乐上传API调用**：`client/src/pages/Admin.jsx` - 使用正确的`uploadAudio`函数而非`uploadImage`
+    - [x] **修复壁纸显示逻辑**：`client/src/components/PageBanner.jsx` - 解决所有横幅显示同一张图片的问题
+    - [x] **修复壁纸轮播逻辑**：`client/src/components/WallpaperCarousel.jsx` - 优化主题切换时的壁纸获取
+    - [x] **修复NavBar.jsx的setUser未定义**：`client/src/components/NavBar.jsx` - 从store导入setUser函数
+    - [x] **优化上传API的Content-Type设置**：`client/src/api/index.js` - 移除手动设置，让浏览器自动处理boundary
+
+    **问题描述**：
+    1. 上传横幅壁纸时提示"没令牌"（认证令牌过期未处理）
+    2. 音乐上传失败（使用了错误的API函数）
+    3. 所有横幅的壁纸显示成同一张（PageBanner组件的hasFetched状态未重置）
+
+    **验证方法**：
+    - 测试令牌过期场景：删除localStorage中的token后尝试上传操作
+    - 测试音乐上传：登录管理后台上传FLAC音频文件
+    - 测试横幅显示：访问不同页面（分类页、文章详情页、友链页等）检查横幅是否不同
+    - 测试壁纸轮播：检查首页壁纸是否随主题切换而变化
+
     ### 第十步 — 用户注册 + 登录 + 评论系统
 
    - [x] **User 模型**：`server/src/models/User.ts`（username, email, password, avatar, role）
