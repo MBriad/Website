@@ -41,7 +41,7 @@ export async function configRoutes(fastify: FastifyInstance) {
     const config = await SiteConfig.findOneAndUpdate(
       {},
       body,
-      { new: true, runValidators: true }
+      { new: true, upsert: true, runValidators: false }
     );
 
     if (!config) {
