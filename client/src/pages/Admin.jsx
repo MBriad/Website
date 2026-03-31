@@ -2,11 +2,12 @@
  * @file src/pages/Admin.jsx
  * @brief 管理后台页面（文章/项目/友链/配置 CRUD）
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import MDEditor from '@uiw/react-md-editor';
+import MDEditor, { commands } from '@uiw/react-md-editor';
 import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI, bannerAPI, socialLinkAPI } from '../api/index.js';
+import { imageUploadCommand, uploadAndInsertImage, extractImageFiles } from '../utils/editorImageUpload.jsx';
 import Loading from '../components/Loading.jsx';
 
 const TABS = [
@@ -245,6 +246,37 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: '', slug: '', content: '', excerpt: '', cover: '', category: '', tags: '', published: true, featured: false });
   const [uploading, setUploading] = useState(false);
+  const editorRef = useRef(null);
+  const showError = (msg) => { setError(msg); setTimeout(() => setError(''), 5000); };
+
+  const handleEditorImage = async (file) => {
+    const textarea = editorRef.current?.textarea;
+    await uploadAndInsertImage(
+      file, textarea,
+      (val) => setForm(prev => ({ ...prev, content: val })),
+      form.content,
+      (msg) => showMessage(msg),
+      (err) => showError(err)
+    );
+  };
+
+  const handleEditorPaste = async (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const images = extractImageFiles(items);
+    if (images.length === 0) return;
+    e.preventDefault();
+    for (const file of images) await handleEditorImage(file);
+  };
+
+  const handleEditorDrop = async (e) => {
+    const items = e.dataTransfer?.items || e.dataTransfer?.files;
+    if (!items) return;
+    const images = extractImageFiles(items);
+    if (images.length === 0) return;
+    e.preventDefault();
+    for (const file of images) await handleEditorImage(file);
+  };
 
   const startNew = () => {
     setForm({ title: '', slug: '', content: '', excerpt: '', cover: '', category: '', tags: '', published: true, featured: false });
@@ -328,12 +360,26 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
             </div>
           )}
         </div>
-        <div data-color-mode="light" style={{ marginBottom: '12px' }}>
+        <div data-color-mode="light" style={{ marginBottom: '12px' }} onPaste={handleEditorPaste} onDrop={handleEditorDrop}>
           <MDEditor
+            ref={editorRef}
             value={form.content}
             onChange={(val) => setForm({ ...form, content: val || '' })}
             height={400}
             preview="live"
+            commands={[
+              commands.bold, commands.italic, commands.strikethrough,
+              commands.title1, commands.title2, commands.title3,
+              commands.link, commands.quote, commands.code, commands.codeBlock,
+              commands.table, commands.hr,
+              commands.unorderedListCommand, commands.orderedListCommand,
+            ]}
+            extraCommands={[
+              imageUploadCommand,
+              commands.divider,
+              commands.codeEdit, commands.codeLive, commands.codePreview,
+              commands.fullscreen,
+            ]}
           />
         </div>
         <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
