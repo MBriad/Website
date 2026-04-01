@@ -29,6 +29,7 @@ const ContributionHeatmap = () => {
     const cells = [];
     const labels = [];
     let lastMonth = -1;
+    let lastLabelCol = -10;
 
     for (let w = 0; w < WEEKS; w++) {
       const week = [];
@@ -39,8 +40,9 @@ const ContributionHeatmap = () => {
         const count = heatmap[dateStr] || 0;
         const isFuture = date > today;
 
-        if (date.getMonth() !== lastMonth && d === 0) {
+        if (date.getMonth() !== lastMonth && d === 0 && w - lastLabelCol >= 4) {
           lastMonth = date.getMonth();
+          lastLabelCol = w;
           labels.push({ month: date.toLocaleString('en', { month: 'short' }), col: w });
         }
 
