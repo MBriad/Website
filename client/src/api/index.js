@@ -255,3 +255,13 @@ export const searchAPI = {
 };
 
 export default api;
+
+/**
+ * 日志 API
+ */
+export const logAPI = {
+  getLogs: (params = {}) => api.get('/logs', { params }),
+  getFiles: () => api.get('/logs/files'),
+  clear: (file) => api.delete('/logs', { params: { file } }),
+  downloadUrl: (file) => `${api.defaults.baseURL}/logs/download?file=${encodeURIComponent(file)}`,
+};

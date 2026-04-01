@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // 确保日志目录存在
-const logsDir = join(__dirname, '../../logs');
+export const logsDir = join(__dirname, '../../logs');
 if (!existsSync(logsDir)) {
   mkdirSync(logsDir, { recursive: true });
 }
@@ -14,7 +14,7 @@ if (!existsSync(logsDir)) {
 /**
  * 创建 Fastify logger 配置
  * - 开发环境：终端彩色输出 + 文件日志
- * - 生产环境：JSON 输出到 stdout（Docker 友好）
+ * - 生产环境：JSON 到 stdout + 文件日志（用于管理后台查看）
  */
 export function createLoggerConfig() {
   const isDev = process.env.NODE_ENV !== 'production';
@@ -39,8 +39,18 @@ export function createLoggerConfig() {
     };
   }
 
-  // 生产环境：JSON 到 stdout，由 Docker 捕获日志
+  // 生产环境：JSON 到 stdout + 文件日志（用于管理后台查看）
+  const logFile = join(logsDir, `app-${new Date().toISOString().split('T')[0]}.log`);
   return {
-    level: 'info'
+    level: 'info',
+    transport: {
+      targets: [
+        {
+          target: 'pino/file',
+          level: 'info',
+          options: { destination: logFile, mkdir: true }
+        }
+      ]
+    }
   };
 }

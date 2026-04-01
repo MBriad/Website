@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MDEditor, { commands } from '@uiw/react-md-editor';
-import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI, bannerAPI, socialLinkAPI } from '../api/index.js';
+import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI, bannerAPI, socialLinkAPI, logAPI } from '../api/index.js';
 import { imageUploadCommand, uploadAndInsertImage, extractImageFiles } from '../utils/editorImageUpload.jsx';
 import Loading from '../components/Loading.jsx';
 
@@ -19,6 +19,7 @@ const TABS = [
   { key: 'banners', label: '页面横幅' },
   { key: 'socialLinks', label: '社交链接' },
   { key: 'config', label: '配置' },
+  { key: 'logs', label: '日志' },
 ];
 
 const Admin = () => {
@@ -235,6 +236,11 @@ const Admin = () => {
             showMessage={showMessage}
             setError={setError}
           />
+        )}
+
+        {/* 日志查看 */}
+        {activeTab === 'logs' && (
+          <LogTab showMessage={showMessage} setError={setError} />
         )}
       </motion.div>
     </div>
@@ -1111,6 +1117,153 @@ const SocialLinkTab = ({ links, onRefresh, showMessage, setError }) => {
         </div>
       ))}
       {links.length === 0 && <div style={{ color: 'var(--text-light)' }}>暂无社交链接</div>}
+    </>
+  );
+};
+
+// ========== 日志 Tab ==========
+const LogTab = ({ showMessage, setError }) => {
+  const [logs, setLogs] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [currentFile, setCurrentFile] = useState('');
+  const [level, setLevel] = useState('');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const showError = (msg) => { setError(msg); setTimeout(() => setError(''), 5000); };
+
+  const fetchLogs = async (p = page) => {
+    setLoading(true);
+    try {
+      const params = { page: p, limit: 50 };
+      if (currentFile) params.file = currentFile;
+      if (level) params.level = level;
+      if (search) params.search = search;
+      const res = await logAPI.getLogs(params);
+      setLogs(res.logs || []);
+      setTotal(res.total || 0);
+      setTotalPages(res.totalPages || 1);
+      if (res.files) setFiles(res.files);
+      if (res.currentFile && !currentFile) setCurrentFile(res.currentFile);
+    } catch {
+      showError('加载日志失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFiles = async () => {
+    try {
+      const res = await logAPI.getFiles();
+      setFiles(res.files?.map(f => f.name) || []);
+    } catch { /* ignore */ }
+  };
+
+  useEffect(() => { fetchFiles(); }, []);
+
+  useEffect(() => { fetchLogs(1); setPage(1); }, [currentFile, level]);
+
+  useEffect(() => {
+    if (!autoRefresh) return;
+    const timer = setInterval(() => fetchLogs(), 5000);
+    return () => clearInterval(timer);
+  }, [autoRefresh, currentFile, level, search, page]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1);
+    fetchLogs(1);
+  };
+
+  const handleClear = async () => {
+    const file = currentFile || 'all';
+    if (!confirm(`确定清空${file === 'all' ? '所有日志' : file}？`)) return;
+    try {
+      await logAPI.clear(file);
+      showMessage('日志已清空');
+      fetchFiles();
+      setLogs([]);
+      setTotal(0);
+    } catch {
+      showError('清空日志失败');
+    }
+  };
+
+  const handleDownload = () => {
+    const file = currentFile || files[0];
+    if (!file) return;
+    window.open(logAPI.downloadUrl(file), '_blank');
+  };
+
+  const levelColor = { info: '#3b82f6', debug: '#6b7280', warn: '#f59e0b', error: '#ef4444', fatal: '#dc2626', trace: '#9ca3af' };
+
+  const toolbarStyle = { padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', color: 'var(--text-ink)', outline: 'none' };
+  const btnStyle = { padding: '6px 14px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.1)', background: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap' };
+
+  return (
+    <>
+      {/* 工具栏 */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <select value={currentFile} onChange={e => setCurrentFile(e.target.value)} style={{ ...toolbarStyle, minWidth: '160px' }}>
+          {files.map(f => <option key={f} value={f}>{f}</option>)}
+        </select>
+        <select value={level} onChange={e => setLevel(e.target.value)} style={toolbarStyle}>
+          <option value="">全部级别</option>
+          <option value="info">Info+</option>
+          <option value="warn">Warn+</option>
+          <option value="error">Error+</option>
+        </select>
+        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', flex: 1 }}>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="搜索日志..." style={{ ...toolbarStyle, flex: 1 }} />
+          <button type="submit" style={btnStyle}>搜索</button>
+        </form>
+        <button onClick={() => setAutoRefresh(!autoRefresh)} style={{ ...btnStyle, color: autoRefresh ? '#10b981' : undefined, borderColor: autoRefresh ? '#10b981' : undefined }}>
+          {autoRefresh ? '自动刷新 ●' : '自动刷新 ○'}
+        </button>
+        <button onClick={handleDownload} style={btnStyle}>下载</button>
+        <button onClick={handleClear} style={{ ...btnStyle, color: '#ff6b6b' }}>清空</button>
+      </div>
+
+      {/* 日志表格 */}
+      <div style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '160px 60px 120px 1fr', gap: '1px', background: 'rgba(0,0,0,0.05)', fontSize: '0.8rem' }}>
+          <div style={{ padding: '8px 12px', fontWeight: 600, background: 'rgba(255,255,255,0.8)' }}>时间</div>
+          <div style={{ padding: '8px 12px', fontWeight: 600, background: 'rgba(255,255,255,0.8)' }}>级别</div>
+          <div style={{ padding: '8px 12px', fontWeight: 600, background: 'rgba(255,255,255,0.8)' }}>请求</div>
+          <div style={{ padding: '8px 12px', fontWeight: 600, background: 'rgba(255,255,255,0.8)' }}>消息</div>
+        </div>
+        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+          {loading && logs.length === 0 && <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-light)', fontSize: '0.85rem' }}>加载中...</div>}
+          {!loading && logs.length === 0 && <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-light)', fontSize: '0.85rem' }}>暂无日志</div>}
+          {logs.map((log, i) => (
+            <div key={i} style={{ display: 'grid', gridTemplateColumns: '160px 60px 120px 1fr', gap: '1px', background: 'rgba(0,0,0,0.02)', borderBottom: '1px solid rgba(0,0,0,0.05)', fontSize: '0.8rem' }}>
+              <div style={{ padding: '6px 12px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{log.time?.slice(11, 19)}</div>
+              <div style={{ padding: '6px 12px', fontFamily: 'monospace', color: levelColor[log.level] || '#666', fontWeight: 600 }}>{log.level}</div>
+              <div style={{ padding: '6px 12px', fontFamily: 'monospace', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {log.req ? `${log.req.method} ${log.req.url}` : ''}
+              </div>
+              <div style={{ padding: '6px 12px', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={log.error?.message || log.msg}>
+                {log.error?.message || log.msg}
+                {log.res && ` (${log.res.statusCode})`}
+                {log.responseTime && ` ${log.responseTime.toFixed(1)}ms`}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 分页 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', fontSize: '0.8rem', color: 'var(--text-light)' }}>
+        <span>共 {total} 条日志</span>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <button disabled={page <= 1} onClick={() => { const p = page - 1; setPage(p); fetchLogs(p); }} style={{ ...btnStyle, opacity: page <= 1 ? 0.5 : 1 }}>上一页</button>
+          <span style={{ padding: '6px 8px' }}>{page} / {totalPages}</span>
+          <button disabled={page >= totalPages} onClick={() => { const p = page + 1; setPage(p); fetchLogs(p); }} style={{ ...btnStyle, opacity: page >= totalPages ? 0.5 : 1 }}>下一页</button>
+        </div>
+      </div>
     </>
   );
 };
