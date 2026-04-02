@@ -172,7 +172,17 @@
   font-family: 'Fira Code', 'Consolas', monospace;
   font-size: 0.9rem;
   line-height: 1.6;
+  color: var(--text-ink);
+  background-color: rgba(160, 216, 239, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.article-content pre code {
   color: #f8f8f2;
+  background: none;
+  padding: 0;
+  border-radius: 0;
 }
 
 .article-content a {
