@@ -13,21 +13,18 @@ const ContributionHeatmap = () => {
     const fetch = async () => {
       try {
         const data = await articleAPI.getHeatmap();
-        console.log('[Heatmap] API response:', data);
         setHeatmap(data || {});
-      } catch (err) {
-        console.error('[Heatmap] Failed to fetch:', err);
-      }
+      } catch { /* ignore */ }
     };
     fetch();
   }, []);
 
   const { grid, monthLabels } = useMemo(() => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayUtc = new Date(today.toISOString().slice(0, 10) + 'T00:00:00Z');
 
-    const start = new Date(today);
-    start.setDate(start.getDate() - ((WEEKS * 7) + today.getDay()));
+    const start = new Date(todayUtc);
+    start.setUTCDate(start.getUTCDate() - ((WEEKS * 7) + todayUtc.getUTCDay()));
 
     const cells = [];
     const labels = [];
@@ -38,13 +35,13 @@ const ContributionHeatmap = () => {
       const week = [];
       for (let d = 0; d < DAYS; d++) {
         const date = new Date(start);
-        date.setDate(date.getDate() + (w * 7) + d);
+        date.setUTCDate(date.getUTCDate() + (w * 7) + d);
         const dateStr = date.toISOString().slice(0, 10);
         const count = heatmap[dateStr] || 0;
-        const isFuture = date > today;
+        const isFuture = date > todayUtc;
 
-        if (date.getMonth() !== lastMonth && d === 0 && w - lastLabelCol >= 4) {
-          lastMonth = date.getMonth();
+        if (date.getUTCMonth() !== lastMonth && d === 0 && w - lastLabelCol >= 4) {
+          lastMonth = date.getUTCMonth();
           lastLabelCol = w;
           labels.push({ month: date.toLocaleString('en', { month: 'short' }), col: w });
         }
