@@ -127,3 +127,48 @@
   - 生产环境密钥应在服务器上直接设置
   - 定期轮换JWT_SECRET等敏感密钥
   - 使用环境变量管理敏感配置
+
+## [部署/Docker] 服务器磁盘 IO 瓶颈导致部署卡死
+- **状态**: 已解决
+- **时间**: 2026-04-01
+- **服务器**: 阿里云 ECS (IP: 8.138.194.87)
+- **问题描述**:
+  - `docker compose up -d --build` 同时构建前后端 + 拉取 MongoDB 镜像
+  - 阿里云 ECS 磁盘 IO 上限低，多任务并发导致 IO 饱和
+  - 结果：SSH 超时（banner exchange timeout）、Docker 构建极慢、需要重启服务器
+- **原因分析**:
+  - `docker compose build` 默认并行构建所有服务，同时 npm ci + npm build + 镜像拉取
+  - MongoDB 基础镜像 (~300MB) 和 Node 基础镜像 (~100MB) 同时下载
+  - 服务器使用的是入门级云盘，IO 性能有限
+- **采用方案**: 分步骤部署，串行执行，每次只做一件事 ✅
+  ```bash
+  # 步骤 1: 停止旧容器（不删 volume）
+  docker compose down
+
+  # 步骤 2: 清理旧镜像释放磁盘空间
+  docker system prune -af
+
+  # 步骤 3: 等 10 秒让 IO 恢复
+  sleep 10
+
+  # 步骤 4: 只构建后端（较小，先搞定）
+  docker compose build backend
+
+  # 步骤 5: 等 10 秒
+  sleep 10
+
+  # 步骤 6: 只构建前端
+  docker compose build frontend
+
+  # 步骤 7: 等 10 秒
+  sleep 10
+
+  # 步骤 8: 启动所有服务
+  docker compose up -d
+  ```
+- **注意事项**:
+  - `docker compose down` **不会删除 volume**，数据库数据安全
+  - 只有 `docker compose down -v` 才会删除 volume，绝对不要用
+  - `docker system prune -af` 不会删除 volume（没有 `--volumes` 参数）
+  - 阿里云 ECS 入门级云盘 IO 约 10-30 MB/s，避免并发读写
+  - 如果 SSH 再次超时，从阿里云控制台网页终端执行剩余步骤
