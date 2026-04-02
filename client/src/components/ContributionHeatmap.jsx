@@ -13,8 +13,11 @@ const ContributionHeatmap = () => {
     const fetch = async () => {
       try {
         const data = await articleAPI.getHeatmap();
+        console.log('[Heatmap] API response:', data);
         setHeatmap(data || {});
-      } catch { /* ignore */ }
+      } catch (err) {
+        console.error('[Heatmap] Failed to fetch:', err);
+      }
     };
     fetch();
   }, []);
@@ -70,6 +73,9 @@ const ContributionHeatmap = () => {
       <div className="heatmap-header">
         <span className="heatmap-total">{total}</span> articles in the last year
       </div>
+      {total === 0 && (
+        <div className="heatmap-empty-hint">No articles yet — publish one to start tracking!</div>
+      )}
       <div className="heatmap-wrapper">
         <div className="heatmap-months">
           {monthLabels.map((m, i) => (
