@@ -58,12 +58,13 @@ const ContributionHeatmap = () => {
   }, [heatmap]);
 
   const getColor = (count, isFuture) => {
-    if (isFuture) return 'var(--heatmap-empty)';
-    if (count === 0) return 'var(--heatmap-empty)';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isFuture) return 'rgba(0,0,0,0.04)';
+    if (count === 0) return isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
     if (count === 1) return 'rgba(160,216,239,0.7)';
     if (count === 2) return 'rgba(160,216,239,0.85)';
     if (count <= 4) return 'rgba(160,216,239,0.95)';
-    return 'var(--accent-blue)';
+    return '#A0D8EF';
   };
 
   const total = Object.values(heatmap).reduce((s, v) => s + v, 0);

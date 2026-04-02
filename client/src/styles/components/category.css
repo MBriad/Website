@@ -225,7 +225,6 @@
   border-radius: 2px;
   cursor: pointer;
   transition: opacity 0.15s;
-  background-color: var(--heatmap-empty);
 }
 
 .heatmap-cell-filled {

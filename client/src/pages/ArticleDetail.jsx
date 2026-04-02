@@ -138,8 +138,8 @@ const ArticleDetail = () => {
             components={{
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '');
-                return !inline ? (
-                  <SyntaxHighlighter style={oneDark} language={match?.[1] || 'text'} PreTag="div" {...props}>
+                return !inline && match ? (
+                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" {...props}>
                     {String(children).replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 ) : (
