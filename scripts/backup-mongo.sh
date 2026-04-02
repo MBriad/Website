@@ -20,14 +20,14 @@ echo "备份名称: $BACKUP_NAME"
 echo "目标目录: $BACKUP_DIR"
 
 # 检查 MongoDB 容器是否运行
-if ! docker-compose ps mongodb | grep -q "Up"; then
+if ! docker compose ps mongodb 2>/dev/null | grep -q "Up"; then
     echo "❌ MongoDB 容器未运行，无法备份"
     exit 1
 fi
 
 # 执行备份
 echo "执行 MongoDB 备份..."
-docker-compose exec -T mongodb mongodump \
+docker compose exec -T mongodb mongodump \
     --db mbri-website \
     --archive \
     --gzip \

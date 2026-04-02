@@ -10,7 +10,7 @@ echo "时间: $(date)"
 
 # ==================== 1. Docker 日志清理 ====================
 echo "1. 清理 Docker 日志和容器..."
-docker system prune -f --volumes
+docker system prune -f
 
 # 清理 Docker 日志文件（如果过大）
 find /var/lib/docker/containers/ -name "*.log" -type f -size +100M -delete 2>/dev/null || true
