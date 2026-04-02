@@ -24,7 +24,7 @@ const ContributionHeatmap = () => {
     const todayUtc = new Date(today.toISOString().slice(0, 10) + 'T00:00:00Z');
 
     const start = new Date(todayUtc);
-    start.setUTCDate(start.getUTCDate() - ((WEEKS * 7) + todayUtc.getUTCDay()));
+    start.setUTCDate(start.getUTCDate() - (((WEEKS - 1) * 7) + todayUtc.getUTCDay()));
 
     const cells = [];
     const labels = [];
