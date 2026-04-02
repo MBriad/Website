@@ -58,12 +58,12 @@ const ContributionHeatmap = () => {
   }, [heatmap]);
 
   const getColor = (count, isFuture) => {
-    if (isFuture) return 'rgba(0,0,0,0.04)';
+    if (isFuture) return 'var(--heatmap-empty)';
     if (count === 0) return 'var(--heatmap-empty)';
-    if (count === 1) return 'rgba(160,216,239,0.55)';
-    if (count === 2) return 'rgba(160,216,239,0.7)';
-    if (count <= 4) return 'rgba(160,216,239,0.85)';
-    return 'rgba(160,216,239,1)';
+    if (count === 1) return 'rgba(160,216,239,0.7)';
+    if (count === 2) return 'rgba(160,216,239,0.85)';
+    if (count <= 4) return 'rgba(160,216,239,0.95)';
+    return 'var(--accent-blue)';
   };
 
   const total = Object.values(heatmap).reduce((s, v) => s + v, 0);
@@ -94,7 +94,7 @@ const ContributionHeatmap = () => {
                 {week.map((cell, di) => (
                   <div
                     key={di}
-                    className="heatmap-cell"
+                    className={cell.count > 0 ? 'heatmap-cell heatmap-cell-filled' : 'heatmap-cell'}
                     style={{ backgroundColor: getColor(cell.count, cell.isFuture) }}
                     onMouseEnter={() => setTooltip(cell)}
                     onMouseLeave={() => setTooltip(null)}

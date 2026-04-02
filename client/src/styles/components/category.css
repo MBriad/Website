@@ -228,6 +228,10 @@
   background-color: var(--heatmap-empty);
 }
 
+.heatmap-cell-filled {
+  box-shadow: 0 0 0 1px rgba(160, 216, 239, 0.6);
+}
+
 .heatmap-cell:hover {
   opacity: 0.7;
 }
