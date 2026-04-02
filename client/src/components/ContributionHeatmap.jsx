@@ -56,10 +56,10 @@ const ContributionHeatmap = () => {
 
   const getColor = (count, isFuture) => {
     if (isFuture) return 'rgba(0,0,0,0.04)';
-    if (count === 0) return 'rgba(0,0,0,0.06)';
-    if (count === 1) return 'rgba(160,216,239,0.4)';
-    if (count === 2) return 'rgba(160,216,239,0.6)';
-    if (count <= 4) return 'rgba(160,216,239,0.8)';
+    if (count === 0) return 'var(--heatmap-empty)';
+    if (count === 1) return 'rgba(160,216,239,0.55)';
+    if (count === 2) return 'rgba(160,216,239,0.7)';
+    if (count <= 4) return 'rgba(160,216,239,0.85)';
     return 'rgba(160,216,239,1)';
   };
 

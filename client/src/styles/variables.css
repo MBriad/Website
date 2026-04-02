@@ -30,6 +30,9 @@
   --font-size-mobile-base: 14px;
   --font-size-mobile-lg: 16px;
   --font-size-mobile-xl: 18px;
+
+  /* 热力图 */
+  --heatmap-empty: rgba(0, 0, 0, 0.08);
 }
 
 [data-theme='dark'] {
@@ -43,4 +46,7 @@
   --text-tertiary: #999;
   --text-muted: #888;
   --text-light: #777;
+
+  /* 热力图 */
+  --heatmap-empty: rgba(255, 255, 255, 0.08);
 }
