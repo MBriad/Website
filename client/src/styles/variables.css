@@ -1,8 +1,5 @@
 /* src/styles/variables.css */
 
-/* 引入一款免费的日系手写/明朝体 Google 字体 (Klee One 或 Shippori Mincho) */
-@import url('https://fonts.loli.net/css2?family=Klee+One:wght@400;600&display=swap');
-
 :root {
   /* 我们敲定的核心调色板 */
   --bg-paper: #F9F9F7;
