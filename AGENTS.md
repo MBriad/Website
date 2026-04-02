@@ -5,7 +5,7 @@ Monorepo personal website with two workspaces:
 - **`client/`** — Vite + React (JSX), Zustand state management, Framer Motion animations, react-router-dom
 - **`server/`** — Fastify + TypeScript, Mongoose (MongoDB), JWT auth, Vitest
 
-No pre-commit hooks or CI workflows configured.
+No pre-commit hooks or CI workflows configured. Server uses ESM (`"type": "module"` in `package.json`).
 
 ### Directory Structure
 - `client/` — Vite + React frontend (`src/api/`, `assets/`, `components/`, `data/`, `hooks/`, `pages/`, `store/`, `styles/`, `test/`)
@@ -16,9 +16,13 @@ No pre-commit hooks or CI workflows configured.
 Create `.env` files:
 - **`server/.env`**: `MONGO_URI=mongodb://localhost:27017/mbri-website`, `JWT_SECRET=your-secret-key`, `PORT=3000`, `NODE_ENV=development`
 - **`client/.env`** (optional): `VITE_API_URL=http://localhost:3000/api`
+- **`ENABLE_CORS=true`** (optional, server): enables CORS — off by default in production since Nginx reverse proxy handles same-origin
 
 ### Dev Server Ports
 Client: `5173`, Server: `3000`, MongoDB: `27017` (via Docker)
+
+### Vite Proxy
+Client dev server proxies `/api` and `/uploads` to `http://localhost:3000` (configured in `client/vite.config.js`).
 
 ## Build / Dev Commands
 All commands run from their respective directory (`client/` or `server/`).
@@ -48,6 +52,7 @@ npm run test:watch    # Run Vitest in watch mode
 - **Test runner**: Vitest (both client and server)
 - **Client tests**: `*.test.{js,jsx}` in `src/` — uses `@testing-library/react`, `jsdom` environment. Setup file: `src/test/setup.js` (imports `@testing-library/jest-dom`)
 - **Server tests**: `*.test.ts` in `src/` — `mongodb-memory-server` for isolated DB tests
+- Both vitest configs set `globals: true` — `describe`, `it`, `expect` available without imports
 - **Run single test**:
   ```bash
   # Client (from client/)
@@ -112,6 +117,7 @@ import { connectDatabase } from './config/database.js';
 - **Server routes**: Return appropriate HTTP status codes with error messages
 - **State**: Single Zustand store (`useStore`) — one file, all global state
 - **API calls**: Centralized in `src/api/index.js` with named exports (`articleAPI`, `projectAPI`)
+  - Note: `logAPI` is exported *after* `export default api` — a minor code style inconsistency agents may encounter
 - **Routing**: react-router-dom v7, routes in `App.jsx`
 - **Server routes**: Each resource in `src/routes/`, exported as async function
 - **Database**: Mongoose schemas + TypeScript interfaces in `src/models/`
@@ -119,7 +125,7 @@ import { connectDatabase } from './config/database.js';
 ## Docker
 ### Basic Commands
 ```bash
-docker-compose up --build     # Build and start all services (frontend:80, backend:3000, mongodb:27017)
+docker-compose up --build     # Build and start all services (only frontend:80/443 exposed; backend & mongodb are internal)
 docker-compose up             # Start existing containers
 docker-compose down           # Stop all services and remove containers
 docker-compose ps             # Show running containers
@@ -134,7 +140,7 @@ docker-compose stats          # View container resource usage
 
 ### Service Details
 - **frontend**: Nginx serving built client on port 80/443
-- **backend**: Node.js Fastify API on port 3000
+- **backend**: Node.js Fastify API on port 3000 (200MB global body limit for FLAC uploads)
 - **mongodb**: MongoDB database on port 27017 (volume: `mongodb-data`)
 
 ### Development vs Production

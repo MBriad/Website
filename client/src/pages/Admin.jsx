@@ -6,6 +6,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MDEditor, { commands } from '@uiw/react-md-editor';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { articleAPI, projectAPI, linkAPI, configAPI, uploadAPI, musicAPI, wallpaperAPI, bannerAPI, socialLinkAPI, logAPI } from '../api/index.js';
 import { imageUploadCommand, uploadAndInsertImage, extractImageFiles } from '../utils/editorImageUpload.jsx';
 import Loading from '../components/Loading.jsx';
@@ -373,6 +375,7 @@ const ArticleTab = ({ articles, onDelete, onRefresh, showMessage, setError }) =>
             onChange={(val) => setForm({ ...form, content: val || '' })}
             height={400}
             preview="live"
+            previewOptions={{ remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] }}
             commands={[
               commands.bold, commands.italic, commands.strikethrough,
               commands.title1, commands.title2, commands.title3,
