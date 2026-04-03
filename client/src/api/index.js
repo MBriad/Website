@@ -201,9 +201,10 @@ export const uploadAPI = {
   uploadAudio: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    // 显式设置Content-Type为multipart/form-data
+    // 显式设置Content-Type为multipart/form-data，大文件需要更长超时
     return api.post('/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000, // 120秒超时，适合大FLAC文件
     });
   },
   uploadWallpaper: (file) => {

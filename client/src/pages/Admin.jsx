@@ -658,6 +658,7 @@ const ConfigTab = ({ config, onRefresh, showMessage, setError }) => {
 const MusicTab = ({ music, onDelete, onRefresh, showMessage, setError }) => {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: '', artist: '', src: '', cover: '', order: 0 });
+  const [uploading, setUploading] = useState(false);
 
   const startAdd = () => {
     setEditing('new');
@@ -670,8 +671,9 @@ const MusicTab = ({ music, onDelete, onRefresh, showMessage, setError }) => {
   };
 
   const handleFileUpload = async (file, field) => {
+    if (uploading) return;
     try {
-      // 根据字段类型选择上传函数
+      setUploading(true);
       const uploadFn = field === 'src' ? uploadAPI.uploadAudio : uploadAPI.uploadImage;
       const res = await uploadFn(file);
       setForm({ ...form, [field]: res.url });
@@ -682,7 +684,10 @@ const MusicTab = ({ music, onDelete, onRefresh, showMessage, setError }) => {
         window.location.href = '/login';
         return;
       }
-      setError(err.response?.data?.error || '上传失败');
+      const msg = err.code === 'ECONNABORTED' ? '上传超时，请重试' : (err.response?.data?.error || '上传失败');
+      setError(msg);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -719,9 +724,9 @@ const MusicTab = ({ music, onDelete, onRefresh, showMessage, setError }) => {
           <input style={inputStyle} placeholder="歌曲标题" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
           <input style={inputStyle} placeholder="艺术家" value={form.artist} onChange={e => setForm({ ...form, artist: e.target.value })} required />
           <div style={{ marginBottom: '12px' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>FLAC 音频文件</label>
-            <input type="file" accept=".flac,audio/flac" onChange={e => e.target.files[0] && handleFileUpload(e.target.files[0], 'src')} style={{ fontSize: '0.85rem' }} />
-            {form.src && <div style={{ fontSize: '0.8rem', color: 'var(--accent-blue)', marginTop: '4px' }}>{form.src.split('/').pop()}</div>}
+            <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>FLAC 音频文件 {uploading && '(上传中...)'}</label>
+            <input type="file" accept=".flac,audio/flac" onChange={e => e.target.files[0] && handleFileUpload(e.target.files[0], 'src')} style={{ fontSize: '0.85rem' }} disabled={uploading} />
+            {form.src && !uploading && <div style={{ fontSize: '0.8rem', color: 'var(--accent-blue)', marginTop: '4px' }}>{form.src.split('/').pop()}</div>}
           </div>
           <div style={{ marginBottom: '12px' }}>
             <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>封面图（可选）</label>
