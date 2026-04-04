@@ -172,3 +172,79 @@
   - `docker system prune -af` 不会删除 volume（没有 `--volumes` 参数）
   - 阿里云 ECS 入门级云盘 IO 约 10-30 MB/s，避免并发读写
   - 如果 SSH 再次超时，从阿里云控制台网页终端执行剩余步骤
+
+---
+
+## [运维/账户] 服务器账户配置
+
+### 用户账户总览
+
+| 用户 | UID | Shell | sudo权限 | 主要用途 |
+|------|-----|-------|----------|----------|
+| root | 0 | /bin/bash | 完整 | 系统管理 |
+| admin | 1000 | /bin/bash | NOPASSWD: ALL | 日常管理、SSH登录 |
+| deploy | 1001 | /bin/bash | NOPASSWD: docker相关 | Docker部署专用 |
+
+### SSH 密钥
+
+| 用户 | 密钥指纹 | 用途 |
+|------|----------|------|
+| root | SHA256:z9NSXJcbCWwQjaCxFNYse5jqC0MD9xrSbmouOzb3A3w | 我们的新密钥 (id_ed25519_server) |
+| admin | 同上 | 使用root的密钥 |
+| deploy | SHA256:IHVCxLnf4bXDl3+j4Rj9MAZKv9cqay1q9u71HWXNfMXa | 阿里云原有密钥 (mbri_alibaba_cloud) |
+
+### 各账户目录内容
+
+#### /home/admin/
+- .bash_history - 命令历史
+- .ssh/ - SSH配置
+- .cache/ - 缓存目录
+
+#### /home/deploy/
+- website/ - 网站源码仓库 (git项目)
+  - client/ - 前端代码
+  - server/ - 后端代码
+  - docker-compose.yml - 容器编排
+  - .env.production - 生产环境配置
+  - .git/ - Git仓库
+  - issues.md, AGENTS.md - 文档
+- .docker/ - Docker buildx 配置
+- .ssh/ - 存有阿里云密钥
+
+### 优化记录
+- 2026-04-03: 限制 deploy 用户仅能执行 docker/docker-compose 命令
+- 2026-04-03: 删除 admin 目录下的冗余 get-docker.sh
+
+---
+
+## [运维/存储] Docker 容器存储位置
+
+### Docker 数据目录
+
+```
+/var/lib/docker/
+├── containers/    # 容器配置文件和日志
+├── image/         # 镜像层数据
+├── volumes/      # Docker 卷（持久数据）
+├── buildkit/     # 构建缓存
+```
+
+### 各类型存储位置
+
+| 类型 | 位置 | 内容 |
+|------|------|------|
+| 容器文件 | /var/lib/docker/containers/ | 运行时的日志、配置 |
+| 镜像层 | /var/lib/docker/image/ | 镜像的只读层 |
+| 卷（数据） | /var/lib/docker/volumes/ | MongoDB 数据等持久化数据 |
+
+### 目录作用说明
+- /home/deploy/website/ = 工厂（源代码，用来构建镜像）
+- /var/lib/docker/ = 仓库（存放和运行已构建好的镜像）
+
+### 容器网络
+```
+Docker 网络: website_default
+├── mbri-frontend  (172.18.0.2)  → Nginx :80
+├── mbri-backend   (172.18.0.3)  → Node.js :3000
+└── mbri-mongodb  (172.18.0.4)  → MongoDB :27017
+```

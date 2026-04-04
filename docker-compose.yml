@@ -1,7 +1,7 @@
 services:
   # MongoDB 数据库
   mongodb:
-    image: mongo:7  # 如拉取失败可改用 m.daocloud.io/docker.io/library/mongo:7
+    image: m.daocloud.io/docker.io/library/mongo:7  # 如拉取失败可改用 m.daocloud.io/docker.io/library/mongo:7
     container_name: mbri-mongodb
     restart: unless-stopped
     volumes:
