@@ -21,6 +21,7 @@ import { musicRoutes } from './routes/music.js';
 import { wallpaperRoutes } from './routes/wallpapers.js';
 import { bannerRoutes } from './routes/banners.js';
 import { socialLinkRoutes } from './routes/socialLinks.js';
+import { logRoutes } from './routes/logs.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // 加载环境变量
@@ -91,6 +92,7 @@ async function registerRoutes() {
     await fastify.register(wallpaperRoutes);
     await fastify.register(bannerRoutes);
     await fastify.register(socialLinkRoutes);
+    await fastify.register(logRoutes);
 }
 // 启动服务器
 async function start() {

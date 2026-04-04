@@ -22,7 +22,7 @@ export async function configRoutes(fastify) {
     // 更新网站配置
     fastify.put('/api/config', { onRequest: [authMiddleware] }, async (request, reply) => {
         const body = request.body;
-        const config = await SiteConfig.findOneAndUpdate({}, body, { new: true, runValidators: true });
+        const config = await SiteConfig.findOneAndUpdate({}, body, { new: true, upsert: true, runValidators: false });
         if (!config) {
             return reply.status(404).send({ error: '网站配置未找到' });
         }

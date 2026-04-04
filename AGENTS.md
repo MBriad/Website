@@ -113,16 +113,28 @@ import { connectDatabase } from './config/database.js';
 - Environment vars: `UPPER_SNAKE_CASE` (e.g., `VITE_API_URL`)
 
 ### Error Handling & Architecture
-- **Client API**: Axios interceptors handle responses; callers handle errors via try/catch
+- **Client API**: Axios interceptors handle responses (auto-retry on 429, auto-logout on 401); callers handle errors via try/catch
 - **Server routes**: Return appropriate HTTP status codes with error messages
 - **State**: Single Zustand store (`useStore`) — one file, all global state
-- **API calls**: Centralized in `src/api/index.js` with named exports (`articleAPI`, `projectAPI`)
-  - Note: `logAPI` is exported *after* `export default api` — a minor code style inconsistency agents may encounter
+- **API layer**: Centralized in `client/src/api/index.js` using Axios with interceptors
+  - Named exports: `articleAPI`, `projectAPI`, `linkAPI`, `configAPI`, `bannerAPI`, `socialLinkAPI`, `authAPI`, `userAPI`, `commentAPI`, `musicAPI`, `wallpaperAPI`, `uploadAPI`, `searchAPI`, `logAPI`
+  - Response interceptor returns `response.data` directly (no need to access `.data`)
 - **Routing**: react-router-dom v7, routes in `App.jsx`
-- **Server routes**: Each resource in `src/routes/`, exported as async function
+- **Server routes**: Each resource in `src/routes/`, exported as async function taking `FastifyInstance`
 - **Database**: Mongoose schemas + TypeScript interfaces in `src/models/`
 
-## Docker
+### Environment Variables
+| Variable | Location | Description |
+|----------|----------|-------------|
+| `MONGO_URI` | server/.env | MongoDB connection string |
+| `JWT_SECRET` | server/.env | Secret key for JWT tokens |
+| `PORT` | server/.env | Server port (default: 3000) |
+| `NODE_ENV` | server/.env | Environment (development/production) |
+| `ENABLE_CORS` | server/.env | Enable CORS (default: false) |
+| `VITE_API_URL` | client/.env | API base URL for client |
+
+### Docker
+
 ### Basic Commands
 ```bash
 docker-compose up --build     # Build and start all services (only frontend:80/443 exposed; backend & mongodb are internal)
