@@ -203,6 +203,42 @@
   margin: 24px 0;
 }
 
+/* 表格样式 */
+.article-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.article-content th,
+.article-content td {
+  padding: 12px 16px;
+  border: 1px solid rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.article-content th {
+  background: rgba(160,216,239,0.15);
+  font-weight: 600;
+}
+
+.article-content tr:nth-child(even) {
+  background: rgba(160,216,239,0.08);
+}
+
+[data-theme='dark'] .article-content th,
+[data-theme='dark'] .article-content td {
+  border-color: rgba(255,255,255,0.1);
+}
+
+[data-theme='dark'] .article-content th {
+  background: rgba(160,216,239,0.2);
+}
+
+[data-theme='dark'] .article-content tr:nth-child(even) {
+  background: rgba(160,216,239,0.1);
+}
+
 /* 文章占位符 */
 .article-placeholder {
   text-align: center;
