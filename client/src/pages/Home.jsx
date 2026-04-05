@@ -2,12 +2,12 @@ import { useRef, useCallback, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  GithubIcon, MailIcon, ArrowIcon, TagIcon,
+  MailIcon, ArrowIcon, TagIcon,
   BilibiliIcon, TelegramIcon, TwitterIcon, DiscordIcon,
   WeChatIcon, LinkedInIcon, InstagramIcon
 } from '../Icons';
 import useTypewriter from '../hooks/useTypewriter';
-import { articleAPI, projectAPI, configAPI, socialLinkAPI } from '../api/index.js';
+import { articleAPI, configAPI, socialLinkAPI } from '../api/index.js';
 import Loading from '../components/Loading.jsx';
 
 const QUOTES = [
@@ -89,7 +89,6 @@ const Home = () => {
   const quote = useTypewriter(QUOTES);
   
   const [articles, setArticles] = useState([]);
-  const [projects, setProjects] = useState([]);
   const [siteConfig, setSiteConfig] = useState(null);
   const [socialLinks, setSocialLinks] = useState([]);
   const [selectedSocialIndex, setSelectedSocialIndex] = useState(0);
@@ -159,9 +158,8 @@ const Home = () => {
         setLoading(true);
         setError(null);
 
-        const [articlesRes, projectsRes, configRes, linksRes] = await Promise.all([
+        const [articlesRes, configRes, linksRes] = await Promise.all([
           articleAPI.getList({ page: 1, limit: 5 }),
-          projectAPI.getList(),
           configAPI.get(),
           socialLinkAPI.getList(),
         ]);
@@ -171,9 +169,6 @@ const Home = () => {
         if (!articlesRes.data?.length || articlesRes.pagination?.pages <= 1) {
           setHasMore(false);
         }
-
-        const featuredProjects = (projectsRes || []).filter(p => p.featured);
-        setProjects(featuredProjects);
 
         setSiteConfig(configRes);
 
@@ -278,23 +273,22 @@ const Home = () => {
       )}
 
       <div className="content-section">
-        <div className="main-content">
-          <section style={{ marginBottom: '60px' }}>
-            <FadeInCard>
-              <div className="section-header">
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 600 }}>
-                  <span className="highlight-blue">最近</span>的文章
-                </h2>
-                <Link to="/category" className="section-link">
-                  <motion.span whileHover={{ x: 5 }}>
-                    查看全部 <ArrowIcon />
-                  </motion.span>
-                </Link>
-              </div>
-            </FadeInCard>
+        <section style={{ marginBottom: '60px' }}>
+          <FadeInCard>
+            <div className="section-header">
+              <h2 style={{ fontSize: '1.3rem', fontWeight: 600 }}>
+                <span className="highlight-blue">最近</span>的文章
+              </h2>
+              <Link to="/category" className="section-link">
+                <motion.span whileHover={{ x: 5 }}>
+                  查看全部 <ArrowIcon />
+                </motion.span>
+              </Link>
+            </div>
+          </FadeInCard>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {articles.map((article) => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {articles.map((article) => (
                 <Link key={article._id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <FadeInCard whileHover={{ x: 5 }} className="article-card">
                     <div className="article-card-cover-wrapper">
@@ -332,50 +326,6 @@ const Home = () => {
               )}
             </div>
           </section>
-        </div>
-
-        <div className="sidebar">
-          <section style={{ marginBottom: '50px' }}>
-            <FadeInCard>
-              <div className="section-header">
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 600 }}>
-                  <span className="highlight-blue">特色</span>项目
-                </h2>
-                <Link to="/chip" className="section-link">
-                  <motion.span whileHover={{ x: 5 }}>
-                    查看全部 <ArrowIcon />
-                  </motion.span>
-                </Link>
-              </div>
-            </FadeInCard>
-
-            <div className="projects-grid">
-              {projects.map((project) => (
-                <FadeInCard key={project._id} whileHover={{ y: -5 }}>
-                  <h3 style={{ fontWeight: 500, marginBottom: '8px' }}>{project.title}</h3>
-                  <p className="project-desc">{project.description}</p>
-                  <div className="project-tech">
-                    {project.techStack.map(t => (
-                      <span key={t} className="tech-badge">{t}</span>
-                    ))}
-                  </div>
-                  <div className="project-links">
-                    {project.github && (
-                      <a href={project.github} target="_blank" rel="noopener noreferrer">
-                        <GithubIcon /> 源码
-                      </a>
-                    )}
-                    {project.demo && (
-                      <a href={project.demo} target="_blank" rel="noopener noreferrer">
-                        <ArrowIcon /> Demo
-                      </a>
-                    )}
-                  </div>
-                </FadeInCard>
-              ))}
-            </div>
-          </section>
-        </div>
       </div>
     </main>
   );

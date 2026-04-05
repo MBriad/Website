@@ -577,26 +577,15 @@
   }
   
   .content-section {
-    display: flex;
-    gap: 40px;
-    max-width: 1200px;
+    max-width: 900px;
+    margin: 0 auto;
     padding: 0 40px 10vh;
   }
-  
-  .main-content {
-    flex: 7;
-    min-width: 0;
-  }
-  
+
   .sidebar {
-    flex: 3;
-    min-width: 280px;
-    position: sticky;
-    top: 100px;
+    width: 280px;
+    flex-shrink: 0;
     align-self: flex-start;
-    height: fit-content;
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
   }
   
   .projects-grid {
