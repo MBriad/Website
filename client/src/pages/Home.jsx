@@ -47,23 +47,18 @@ const FadeInCard = ({ children, className, style, whileHover }) => {
   );
 };
 
-// 社交图标组件 - 根据平台名称渲染对应的SVG图标
 const SocialIcon = ({ iconName, className }) => {
-  // 图标映射表：将数据库中的icon字段映射到对应的SVG组件
   const iconMap = {
-    // 直接平台名称映射
     'github': GithubIcon,
     'mail': MailIcon,
     'bilibili': BilibiliIcon,
     'telegram': TelegramIcon,
     'twitter': TwitterIcon,
-    'x': TwitterIcon, // Twitter现在叫X
+    'x': TwitterIcon,
     'discord': DiscordIcon,
     'wechat': WeChatIcon,
     'linkedin': LinkedInIcon,
     'instagram': InstagramIcon,
-    
-    // Iconify格式兼容（向后兼容）
     'simple-icons:github': GithubIcon,
     'simple-icons:bilibili': BilibiliIcon,
     'simple-icons:telegram': TelegramIcon,
@@ -76,11 +71,9 @@ const SocialIcon = ({ iconName, className }) => {
     'openmoji:mail': MailIcon,
   };
 
-  // 查找对应的图标组件
   const IconComponent = iconMap[iconName.toLowerCase()] || null;
 
   if (!IconComponent) {
-    // 如果没有找到对应的图标，显示一个占位符
     console.warn(`未找到图标: ${iconName}`);
     return (
       <span className={`icon-placeholder ${className || ''}`} style={{ fontSize: '28px' }}>
@@ -93,10 +86,8 @@ const SocialIcon = ({ iconName, className }) => {
 };
 
 const Home = () => {
-  const contentRef = useRef(null);
   const quote = useTypewriter(QUOTES);
   
-  // 状态管理
   const [articles, setArticles] = useState([]);
   const [projects, setProjects] = useState([]);
   const [siteConfig, setSiteConfig] = useState(null);
@@ -105,32 +96,87 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 从 API 获取数据
+  const [page, setPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const loadMoreRef = useRef(null);
+
+  const pageRef = useRef(page);
+  pageRef.current = page;
+
+  const loadingMoreRef = useRef(loadingMore);
+  loadingMoreRef.current = loadingMore;
+
+  const hasMoreRef = useRef(hasMore);
+  hasMoreRef.current = hasMore;
+
+  const loadMoreArticlesRef = useRef(null);
+
+  const loadMoreArticles = useCallback(async () => {
+    if (loadingMoreRef.current || !hasMoreRef.current) return;
+    
+    setLoadingMore(true);
+    try {
+      const nextPage = pageRef.current + 1;
+      const res = await articleAPI.getList({ page: nextPage, limit: 5 });
+      const newArticles = res.data || [];
+      
+      setArticles(prev => [...prev, ...newArticles]);
+      setPage(nextPage);
+      
+      if (!newArticles.length || nextPage >= res.pagination?.pages) {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error('Failed to load more articles:', err);
+      setHasMore(false);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, []);
+
+  loadMoreArticlesRef.current = loadMoreArticles;
+
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+    
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
+          loadMoreArticlesRef.current?.();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // 并行获取文章、项目和网站配置
         const [articlesRes, projectsRes, configRes, linksRes] = await Promise.all([
-          articleAPI.getList({ limit: 5 }),
+          articleAPI.getList({ page: 1, limit: 5 }),
           projectAPI.getList(),
           configAPI.get(),
           socialLinkAPI.getList(),
         ]);
 
-        // 设置文章数据
         setArticles(articlesRes.data || []);
+        
+        if (!articlesRes.data?.length || articlesRes.pagination?.pages <= 1) {
+          setHasMore(false);
+        }
 
-        // 设置项目数据（筛选精选项目）
         const featuredProjects = (projectsRes || []).filter(p => p.featured);
         setProjects(featuredProjects);
 
-        // 设置网站配置
         setSiteConfig(configRes);
 
-        // 设置社交链接
         setSocialLinks(linksRes || []);
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -143,12 +189,10 @@ const Home = () => {
     fetchData();
   }, []);
 
-  // 加载状态
   if (loading) {
     return <Loading />;
   }
 
-  // 错误状态
   if (error) {
     return (
       <main className="home-container">
@@ -163,7 +207,6 @@ const Home = () => {
 
   return (
     <main className="home-container">
-      {/* Hero 全屏首屏 */}
       <section className="hero-section">
         <motion.img
           src="/avatar.jpg"
@@ -174,7 +217,6 @@ const Home = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
         />
 
-        {/* 合并后的大毛玻璃框 - 引言 + 社交图标 */}
         <div className="glass-quote-box">
           {socialLinks.length > 0 && (
             <span className="glass-arrow left" onClick={() => setSelectedSocialIndex((selectedSocialIndex - 1 + socialLinks.length) % socialLinks.length)}>❮</span>
@@ -213,7 +255,6 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* 个人介绍区域 */}
       {siteConfig && (
         <section className="intro-section">
           <FadeInCard className="intro-card">
@@ -236,97 +277,105 @@ const Home = () => {
         </section>
       )}
 
-      {/* 下方内容区 */}
       <div className="content-section">
-        {/* 最新文章 */}
-        <section style={{ marginBottom: '60px' }}>
-          <FadeInCard>
-            <div className="section-header">
-              <h2 style={{ fontSize: '1.3rem', fontWeight: 600 }}>
-                <span className="highlight-blue">最近</span>的文章
-              </h2>
-              <Link to="/category" className="section-link">
-                <motion.span whileHover={{ x: 5 }}>
-                  查看全部 <ArrowIcon />
-                </motion.span>
-              </Link>
-            </div>
-          </FadeInCard>
+        <div className="main-content">
+          <section style={{ marginBottom: '60px' }}>
+            <FadeInCard>
+              <div className="section-header">
+                <h2 style={{ fontSize: '1.3rem', fontWeight: 600 }}>
+                  <span className="highlight-blue">最近</span>的文章
+                </h2>
+                <Link to="/category" className="section-link">
+                  <motion.span whileHover={{ x: 5 }}>
+                    查看全部 <ArrowIcon />
+                  </motion.span>
+                </Link>
+              </div>
+            </FadeInCard>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {articles.map((article) => (
-              <Link key={article._id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <FadeInCard whileHover={{ x: 5 }} className="article-card">
-                  <div className="article-card-cover-wrapper">
-                    {article.cover ? (
-                      <img src={article.cover} alt={article.title} className="article-card-cover" />
-                    ) : (
-                      <div className="article-card-cover-placeholder" />
-                    )}
-                    <div className="article-card-overlay">
-                      <h3 className="article-card-title">{article.title}</h3>
-                      <p className="article-card-excerpt">{article.excerpt}</p>
-                    </div>
-                  </div>
-                  <div className="article-card-body">
-                    <div className="article-meta">
-                      <span>{new Date(article.createdAt).toLocaleDateString('zh-CN')}</span>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        {article.tags.map(tag => (
-                          <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <TagIcon /> {tag}
-                          </span>
-                        ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {articles.map((article) => (
+                <Link key={article._id} to={`/article/${article.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <FadeInCard whileHover={{ x: 5 }} className="article-card">
+                    <div className="article-card-cover-wrapper">
+                      {article.cover ? (
+                        <img src={article.cover} alt={article.title} className="article-card-cover" />
+                      ) : (
+                        <div className="article-card-cover-placeholder" />
+                      )}
+                      <div className="article-card-overlay">
+                        <h3 className="article-card-title">{article.title}</h3>
+                        <p className="article-card-excerpt">{article.excerpt}</p>
                       </div>
                     </div>
+                    <div className="article-card-body">
+                      <div className="article-meta">
+                        <span>{new Date(article.createdAt).toLocaleDateString('zh-CN')}</span>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {article.tags.map(tag => (
+                            <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <TagIcon /> {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </FadeInCard>
+                </Link>
+              ))}
+            </div>
+
+            <div ref={loadMoreRef} style={{ padding: '20px', textAlign: 'center' }}>
+              {loadingMore && <Loading />}
+              {!hasMore && articles.length > 0 && (
+                <p style={{ color: '#888', fontSize: '0.9rem' }}>没有更多文章了</p>
+              )}
+            </div>
+          </section>
+        </div>
+
+        <div className="sidebar">
+          <section style={{ marginBottom: '50px' }}>
+            <FadeInCard>
+              <div className="section-header">
+                <h2 style={{ fontSize: '1.3rem', fontWeight: 600 }}>
+                  <span className="highlight-blue">特色</span>项目
+                </h2>
+                <Link to="/chip" className="section-link">
+                  <motion.span whileHover={{ x: 5 }}>
+                    查看全部 <ArrowIcon />
+                  </motion.span>
+                </Link>
+              </div>
+            </FadeInCard>
+
+            <div className="projects-grid">
+              {projects.map((project) => (
+                <FadeInCard key={project._id} whileHover={{ y: -5 }}>
+                  <h3 style={{ fontWeight: 500, marginBottom: '8px' }}>{project.title}</h3>
+                  <p className="project-desc">{project.description}</p>
+                  <div className="project-tech">
+                    {project.techStack.map(t => (
+                      <span key={t} className="tech-badge">{t}</span>
+                    ))}
+                  </div>
+                  <div className="project-links">
+                    {project.github && (
+                      <a href={project.github} target="_blank" rel="noopener noreferrer">
+                        <GithubIcon /> 源码
+                      </a>
+                    )}
+                    {project.demo && (
+                      <a href={project.demo} target="_blank" rel="noopener noreferrer">
+                        <ArrowIcon /> Demo
+                      </a>
+                    )}
                   </div>
                 </FadeInCard>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* 特色项目 */}
-        <section style={{ marginBottom: '50px' }}>
-          <FadeInCard>
-            <div className="section-header">
-              <h2 style={{ fontSize: '1.3rem', fontWeight: 600 }}>
-                <span className="highlight-blue">特色</span>项目
-              </h2>
-              <Link to="/chip" className="section-link">
-                <motion.span whileHover={{ x: 5 }}>
-                  查看全部 <ArrowIcon />
-                </motion.span>
-              </Link>
+              ))}
             </div>
-          </FadeInCard>
-
-          <div className="projects-grid">
-            {projects.map((project) => (
-              <FadeInCard key={project._id} whileHover={{ y: -5 }}>
-                <h3 style={{ fontWeight: 500, marginBottom: '8px' }}>{project.title}</h3>
-                <p className="project-desc">{project.description}</p>
-                <div className="project-tech">
-                  {project.techStack.map(t => (
-                    <span key={t} className="tech-badge">{t}</span>
-                  ))}
-                </div>
-                <div className="project-links">
-                  {project.github && (
-                    <a href={project.github} target="_blank" rel="noopener noreferrer">
-                      <GithubIcon /> 源码
-                    </a>
-                  )}
-                  {project.demo && (
-                    <a href={project.demo} target="_blank" rel="noopener noreferrer">
-                      <ArrowIcon /> Demo
-                    </a>
-                  )}
-                </div>
-              </FadeInCard>
-            ))}
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
     </main>
   );

@@ -458,7 +458,14 @@
   }
   
   .content-section {
+    display: flex;
+    flex-direction: column-reverse;
     padding: 0 16px 8vh;
+  }
+  
+  .sidebar {
+    display: block;
+    margin-bottom: 24px;
   }
   
   .fade-in-card {
@@ -543,8 +550,13 @@
   }
   
   .content-section {
+    display: block;
     max-width: 700px;
     padding: 0 30px 10vh;
+  }
+  
+  .sidebar {
+    display: none;
   }
   
   .projects-grid {
@@ -565,8 +577,26 @@
   }
   
   .content-section {
-    max-width: 900px;
+    display: flex;
+    gap: 40px;
+    max-width: 1200px;
     padding: 0 40px 10vh;
+  }
+  
+  .main-content {
+    flex: 7;
+    min-width: 0;
+  }
+  
+  .sidebar {
+    flex: 3;
+    min-width: 280px;
+    position: sticky;
+    top: 100px;
+    align-self: flex-start;
+    height: fit-content;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
   }
   
   .projects-grid {
