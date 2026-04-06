@@ -326,7 +326,6 @@ const Home = () => {
               )}
             </div>
           </section>
-      </div>
     </main>
   );
 };
