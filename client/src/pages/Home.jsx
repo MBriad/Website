@@ -2,7 +2,7 @@ import { useRef, useCallback, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  MailIcon, ArrowIcon, TagIcon,
+  GithubIcon, MailIcon, ArrowIcon, TagIcon,
   BilibiliIcon, TelegramIcon, TwitterIcon, DiscordIcon,
   WeChatIcon, LinkedInIcon, InstagramIcon
 } from '../Icons';
