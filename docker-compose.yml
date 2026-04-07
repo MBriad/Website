@@ -6,9 +6,9 @@ services:
     restart: unless-stopped
     volumes:
       - mongodb-data:/data/db
-    # 端口不暴露到宿主机，仅 Docker 网络内部访问
-    # ports:
-    #   - "27017:27017"
+    # 端口仅暴露到本机 (127.0.0.1)，外部无法访问
+    ports:
+      - "127.0.0.1:27018:27017"
     environment:
       MONGO_INITDB_DATABASE: mbri-website
     healthcheck:

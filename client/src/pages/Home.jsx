@@ -137,20 +137,24 @@ const Home = () => {
   loadMoreArticlesRef.current = loadMoreArticles;
 
   useEffect(() => {
-    if (!loadMoreRef.current) return;
+    const timeout = setTimeout(() => {
+      if (!loadMoreRef.current) return;
+      
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
+            loadMoreArticlesRef.current?.();
+          }
+        },
+        { threshold: 0.1 }
+      );
+      
+      observer.observe(loadMoreRef.current);
+      return () => observer.disconnect();
+    }, 100);
     
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
-          loadMoreArticlesRef.current?.();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    
-    observer.observe(loadMoreRef.current);
-    return () => observer.disconnect();
-  }, []);
+    return () => clearTimeout(timeout);
+  }, [hasMore, loadingMore]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -316,8 +320,7 @@ const Home = () => {
                     </div>
                   </FadeInCard>
                 </Link>
-              ))}
-            </div>
+            ))}
 
             <div ref={loadMoreRef} style={{ padding: '20px', textAlign: 'center' }}>
               {loadingMore && <Loading />}
@@ -325,8 +328,8 @@ const Home = () => {
                 <p style={{ color: '#888', fontSize: '0.9rem' }}>没有更多文章了</p>
               )}
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
     </main>
   );

@@ -7,6 +7,9 @@ Monorepo personal website with two workspaces:
 
 No pre-commit hooks or CI workflows configured. Server uses ESM (`"type": "module"` in `package.json`).
 
+### OpenCode Configuration
+`opencode.json` at root loads the `superpowers` plugin — includes skills for brainstorming, debugging, TDD, and code review that activate automatically.
+
 ### Directory Structure
 - `client/` — Vite + React frontend (`src/api/`, `assets/`, `components/`, `data/`, `hooks/`, `pages/`, `store/`, `styles/`, `test/`)
 - `server/` — Fastify + TypeScript backend (`src/config/`, `models/`, `routes/`, `middleware/`, `utils/`, `scripts/`)
@@ -14,12 +17,10 @@ No pre-commit hooks or CI workflows configured. Server uses ESM (`"type": "modul
 
 ### Environment Setup
 Create `.env` files:
-- **`server/.env`**: `MONGO_URI=mongodb://localhost:27017/mbri-website`, `JWT_SECRET=your-secret-key`, `PORT=3000`, `NODE_ENV=development`
-- **`client/.env`** (optional): `VITE_API_URL=http://localhost:3000/api`
-- **`ENABLE_CORS=true`** (optional, server): enables CORS — off by default in production since Nginx reverse proxy handles same-origin
+- **`server/.env`**: `MONGODB_URI=mongodb://localhost:27017/mbri-website`, `JWT_SECRET=your-secret-key`, `PORT=3000`, `NODE_ENV=development`, `ENABLE_CORS=true`
 
 ### Dev Server Ports
-Client: `5173`, Server: `3000`, MongoDB: `27017` (via Docker)
+Client: `5173`, Server: `3000`, MongoDB: `27017` (Docker: internal only, not exposed to host)
 
 ### Vite Proxy
 Client dev server proxies `/api` and `/uploads` to `http://localhost:3000` (configured in `client/vite.config.js`).
@@ -126,11 +127,11 @@ import { connectDatabase } from './config/database.js';
 ### Environment Variables
 | Variable | Location | Description |
 |----------|----------|-------------|
-| `MONGO_URI` | server/.env | MongoDB connection string |
+| `MONGODB_URI` | server/.env | MongoDB connection string (not MONGO_URI!) |
 | `JWT_SECRET` | server/.env | Secret key for JWT tokens |
 | `PORT` | server/.env | Server port (default: 3000) |
 | `NODE_ENV` | server/.env | Environment (development/production) |
-| `ENABLE_CORS` | server/.env | Enable CORS (default: false) |
+| `ENABLE_CORS` | server/.env | Enable CORS (default: false, true for dev) |
 | `VITE_API_URL` | client/.env | API base URL for client |
 
 ### Docker
@@ -152,8 +153,8 @@ docker-compose stats          # View container resource usage
 
 ### Service Details
 - **frontend**: Nginx serving built client on port 80/443
-- **backend**: Node.js Fastify API on port 3000 (200MB global body limit for FLAC uploads)
-- **mongodb**: MongoDB database on port 27017 (volume: `mongodb-data`)
+- **backend**: Node.js Fastify API on port 3000 (200MB global body limit for FLAC uploads), health check: `/api/health`
+- **mongodb**: MongoDB database on port 27017 (volume: `mongodb-data`, internal-only from host)
 
 ### Development vs Production
 - **Development**: Run `npm run dev` in client/ and server/ directories separately
