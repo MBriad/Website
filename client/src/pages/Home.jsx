@@ -322,7 +322,7 @@ const Home = () => {
                 </Link>
             ))}
 
-            <div ref={loadMoreRef} style={{ padding: '20px', textAlign: 'center' }}>
+            <div ref={loadMoreRef} style={{ padding: '20px', textAlign: 'center', minHeight: '1px' }}>
               {loadingMore && <Loading />}
               {!hasMore && articles.length > 0 && (
                 <p style={{ color: '#888', fontSize: '0.9rem' }}>没有更多文章了</p>
