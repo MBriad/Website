@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import './styles/components/footer.css';
+import '../styles/components/footer.css';
 
 const Footer = () => {
   return (
