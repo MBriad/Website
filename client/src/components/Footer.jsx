@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import './styles/components/footer.css';
 
 const Footer = () => {
   return (
@@ -14,6 +15,10 @@ const Footer = () => {
       </div>
       <div className="footer-copyright">
         Crafted with React & Vite
+      </div>
+      <div className="footer-icp">
+        <span className="icp-badge">粤ICP备</span>
+        <span className="icp-number">2026037331号</span>
       </div>
     </motion.footer>
   );

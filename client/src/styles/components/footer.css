@@ -47,3 +47,51 @@
 [data-theme='dark'] .footer-copyright {
   color: var(--text-muted);
 }
+
+/* 备案信息卡片 */
+.footer-icp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--card-bg, rgba(255, 255, 255, 0.85));
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  margin-top: 10px;
+}
+
+.icp-badge {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #555);
+  font-weight: 500;
+}
+
+.icp-number {
+  font-size: 0.75rem;
+  color: var(--highlight-blue, #4a90d9);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .footer-icp {
+  background: var(--card-bg, rgba(30, 30, 30, 0.85));
+}
+
+[data-theme='dark'] .icp-badge {
+  color: var(--text-light, #aaa);
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    padding: 30px 15px 20px;
+  }
+  
+  .footer-commend {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .footer-icp {
+    padding: 6px 12px;
+  }
+}
