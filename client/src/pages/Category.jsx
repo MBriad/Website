@@ -35,7 +35,7 @@ const Category = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await articleAPI.getList();
+        const response = await articleAPI.getList({ limit: 100 });
         setArticles(response.data || []);
       } catch (err) {
         console.error('Failed to fetch articles:', err);
