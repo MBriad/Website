@@ -1,5 +1,5 @@
 # 构建阶段
-FROM node:20-alpine AS build
+FROM m.daocloud.io/docker.io/library/node:20-alpine AS build
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # 运行阶段
-FROM node:20-alpine
+FROM m.daocloud.io/docker.io/library/node:20-alpine
 
 WORKDIR /app
 
