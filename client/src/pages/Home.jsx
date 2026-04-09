@@ -98,7 +98,6 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const loadMoreRef = useRef(null);
 
   const pageRef = useRef(page);
   pageRef.current = page;
@@ -109,10 +108,8 @@ const Home = () => {
   const hasMoreRef = useRef(hasMore);
   hasMoreRef.current = hasMore;
 
-  const loadMoreArticlesRef = useRef(null);
-
   const loadMoreArticles = useCallback(async () => {
-    if (loadingMoreRef.current || !hasMoreRef.current) return;
+    if (loadingMore || !hasMore) return;
     
     setLoadingMore(true);
     try {
@@ -132,29 +129,24 @@ const Home = () => {
     } finally {
       setLoadingMore(false);
     }
-  }, []);
-
-  loadMoreArticlesRef.current = loadMoreArticles;
+  }, [loadingMore, hasMore]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (!loadMoreRef.current) return;
+    const handleScroll = () => {
+      if (loadingMore || !hasMore) return;
       
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
-            loadMoreArticlesRef.current?.();
-          }
-        },
-        { threshold: 0.1 }
-      );
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
       
-      observer.observe(loadMoreRef.current);
-      return () => observer.disconnect();
-    }, 100);
+      if (scrollTop + windowHeight >= docHeight - 100) {
+        loadMoreArticles();
+      }
+    };
     
-    return () => clearTimeout(timeout);
-  }, [hasMore, loadingMore]);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadMoreArticles, loadingMore, hasMore]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -322,12 +314,14 @@ const Home = () => {
                 </Link>
             ))}
 
-            <div ref={loadMoreRef} style={{ padding: '20px', textAlign: 'center', minHeight: '1px' }}>
-              {loadingMore && <Loading />}
-              {!hasMore && articles.length > 0 && (
-                <p style={{ color: '#888', fontSize: '0.9rem' }}>没有更多文章了</p>
-              )}
-            </div>
+            {loadingMore && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <Loading />
+              </div>
+            )}
+            {!hasMore && articles.length > 0 && (
+              <p style={{ padding: '20px', textAlign: 'center', color: '#888', fontSize: '0.9rem' }}>没有更多文章了</p>
+            )}
           </div>
         </section>
       </div>
