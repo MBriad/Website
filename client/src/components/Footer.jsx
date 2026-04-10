@@ -14,11 +14,7 @@ const Footer = () => {
         © {new Date().getFullYear()} MBri の 小窝
       </div>
       <div className="footer-copyright">
-        Crafted with React & Vite
-      </div>
-      <div className="footer-icp">
-        <span className="icp-badge">粤ICP备</span>
-        <span className="icp-number">2026037331号</span>
+        粤ICP备2026037331号
       </div>
     </motion.footer>
   );
