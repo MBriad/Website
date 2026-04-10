@@ -46,3 +46,6 @@ client/public/uploads/  # 用户上传的静态文件
 # Build artifacts (already tracked but should not be modified)
 # server/dist/
 # client/dist/
+
+# SSL certificates
+ssl/

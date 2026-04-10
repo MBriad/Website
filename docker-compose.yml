@@ -52,6 +52,9 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./client/dist:/usr/share/nginx/html
+      - ./ssl:/etc/nginx/ssl:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/"]
       interval: 10s
