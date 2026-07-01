@@ -43,9 +43,7 @@
 
 ## 访问测试
 
-### 公网访问
-- ✅ 网站: http://8.138.194.87
-- ✅ API健康检查: http://8.138.194.87/api/health
+
 
 ### 内部服务
 - ✅ 前端健康检查: 通过
@@ -62,7 +60,7 @@
   - `website-frontend:latest` (26.9 MB)
 
 ### 镜像加速
-- ✅ 已配置阿里云镜像加速: https://y4f67qbs.mirror.aliyuncs.com
+
 
 ## 部署脚本
 
